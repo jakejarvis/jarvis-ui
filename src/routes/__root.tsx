@@ -1,6 +1,7 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Analytics } from "@vercel/analytics/react";
 
 import { DocsShell } from "@/components/docs/docs-shell";
 import { ThemeProvider, themeScript } from "@/components/docs/theme-provider";
@@ -19,11 +20,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Jarvis UI Registry",
-      },
-      {
-        name: "description",
-        content: "A minimal documentation site and shadcn-compatible component registry.",
+        title: "Jarvis UI",
       },
     ],
     links: [
@@ -56,7 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <HeadContent />
       </head>
-      <body className="font-sans [overflow-wrap:anywhere] antialiased">
+      <body className="font-sans [overflow-wrap:anywhere] tabular-nums antialiased">
         {children}
         <TanStackDevtools
           config={{
@@ -69,6 +66,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             },
           ]}
         />
+        <Analytics />
         <Scripts />
       </body>
     </html>

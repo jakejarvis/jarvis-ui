@@ -69,6 +69,8 @@ export function getInstallCommand(itemName: string, packageManager: PackageManag
     case "npm":
       return `npx shadcn@latest add ${registryItemUrl}`;
   }
+
+  return assertNever(packageManager);
 }
 
 export function setPackageManagerPreference(packageManager: PackageManager) {
@@ -219,4 +221,8 @@ function usePackageManagerPreference() {
 
 function isPackageManager(value: string | null): value is PackageManager {
   return packageManagers.some((option) => option.value === value);
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unhandled package manager: ${String(value)}`);
 }

@@ -72,16 +72,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     setResolvedTheme(applyTheme(theme));
 
-    if (theme !== "system") {
-      return;
+    let cleanup: (() => void) | undefined;
+
+    if (theme === "system") {
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      const handleChange = () => setResolvedTheme(applyTheme("system"));
+
+      media.addEventListener("change", handleChange);
+      cleanup = () => media.removeEventListener("change", handleChange);
     }
 
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => setResolvedTheme(applyTheme("system"));
-
-    media.addEventListener("change", handleChange);
-
-    return () => media.removeEventListener("change", handleChange);
+    return cleanup;
   }, [theme]);
 
   const value = React.useMemo(
