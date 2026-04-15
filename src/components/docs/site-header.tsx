@@ -97,6 +97,21 @@ function MobileNav({ pathname, onNavigate }: { pathname: string; onNavigate: () 
         >
           Home
         </Link>
+        {navLinks.map((link) => (
+          <Link
+            key={link.href}
+            to={link.href}
+            onClick={onNavigate}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-sm transition-colors hover:text-foreground",
+              pathname.startsWith(link.href)
+                ? "font-medium text-foreground"
+                : "text-muted-foreground",
+            )}
+          >
+            {link.label}
+          </Link>
+        ))}
       </div>
 
       {componentItems.length > 0 && (
