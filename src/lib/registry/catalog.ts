@@ -17,7 +17,7 @@ export const siteConfig = {
 
 type RegistryItem = RegistryItemDefinition;
 export type RegistryFile = RegistryFileDefinition;
-export type RegistryType = RegistryItem["type"];
+type RegistryType = RegistryItem["type"];
 type RegistryMetaModule = {
   registryItem?: RegistryItemDefinition;
 };

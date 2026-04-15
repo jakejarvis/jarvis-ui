@@ -2,6 +2,7 @@ import { renderServerComponent } from "@tanstack/react-start/rsc";
 
 import { getRegistryItem } from "./catalog";
 import type { RegistryItemDetailInput } from "./detail.types";
+import { getRegistryDisplaySource } from "./display-source.server";
 import { highlightCodeToHtml } from "./highlight.server";
 import {
   getRegistryItemWithSources,
@@ -48,8 +49,8 @@ async function highlightRegistryItem(
   item: RegistryCatalogItemWithSources,
 ): Promise<RegistryItemDetail> {
   const [previewSourceFile, sourceFiles] = await Promise.all([
-    highlightPreviewSourceFile(item.previewSourceFile),
-    Promise.all(item.sourceFiles.map((file) => highlightSourceFile(file))),
+    highlightPreviewSourceFile(item, item.previewSourceFile),
+    Promise.all(item.sourceFiles.map((file) => highlightSourceFile(item, file))),
   ]);
 
   return {
@@ -60,20 +61,28 @@ async function highlightRegistryItem(
 }
 
 async function highlightPreviewSourceFile(
+  item: RegistryCatalogItemWithSources,
   file: RegistryPreviewSourceFileWithSource,
 ): Promise<HighlightedRegistryPreviewSourceFile> {
+  const source = getRegistryDisplaySource(item, file);
+
   return {
     ...file,
-    highlightedCode: await renderCode(file),
+    source,
+    highlightedCode: await renderCode({ ...file, source }),
   };
 }
 
 async function highlightSourceFile(
+  item: RegistryCatalogItemWithSources,
   file: RegistrySourceFileWithSource,
 ): Promise<HighlightedRegistrySourceFile> {
+  const source = getRegistryDisplaySource(item, file);
+
   return {
     ...file,
-    highlightedCode: await renderCode(file),
+    source,
+    highlightedCode: await renderCode({ ...file, source }),
   };
 }
 

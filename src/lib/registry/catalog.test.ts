@@ -5,6 +5,7 @@ import {
   registryMetadataItems,
   registryItems,
 } from "@/lib/registry/catalog";
+import { getRegistryDisplaySource } from "@/lib/registry/display-source.server";
 import {
   getRegistryIndexJson,
   getRegistryItemJson,
@@ -110,6 +111,38 @@ describe("registry catalog", () => {
     }
   });
 
+  test("rewrites preview source imports to installable aliases for display", () => {
+    const item = getRegistryItemWithSources(getRegistryItemByName("copy-button"));
+    const displaySource = getRegistryDisplaySource(item, item.previewSourceFile);
+
+    expect(displaySource).toContain(`from "@/components/ui/copy-button"`);
+    expect(displaySource).not.toContain(`from "./copy-button"`);
+  });
+
+  test("rewrites relative imports between published source files for display", () => {
+    const item = {
+      sourceFiles: [
+        {
+          path: "registry/base-nova/example/example.tsx",
+          type: "registry:component",
+          source: "",
+        },
+        {
+          path: "registry/base-nova/example/use-example.ts",
+          type: "registry:hook",
+          source: "",
+        },
+      ],
+    } as const;
+    const displaySource = getRegistryDisplaySource(item, {
+      path: "registry/base-nova/example/example.tsx",
+      source: [`import { useExample } from "./use-example";`, `import "./example.css";`].join("\n"),
+    });
+
+    expect(displaySource).toContain(`from "@/hooks/use-example"`);
+    expect(displaySource).toContain(`import "./example.css";`);
+  });
+
   test("publishes blocks as multi-file registry items", () => {
     const blocks = registryItems.filter((item) => item.type === "registry:block");
 
@@ -118,6 +151,16 @@ describe("registry catalog", () => {
     }
   });
 });
+
+function getRegistryItemByName(name: string) {
+  const item = registryItems.find((registryItem) => registryItem.name === name);
+
+  if (!item) {
+    throw new Error(`Missing registry item: ${name}`);
+  }
+
+  return item;
+}
 
 function getAlphabetizedItemNames(items: Array<{ name: string; title: string }>) {
   return items.toSorted(compareRegistryItemNames).map((item) => item.name);

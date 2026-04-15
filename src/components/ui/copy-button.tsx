@@ -113,4 +113,4 @@ async function copyTextToClipboard(value: string) {
   }
 }
 
-export { CopyButton, type CopyButtonProps };
+export { CopyButton };

@@ -11,15 +11,15 @@ export const registryJsonResponseHeaders = {
   "Cache-Control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
 } as const;
 
-export type RegistryIndexJson = typeof registryConfig & {
+type RegistryIndexJson = typeof registryConfig & {
   items: RegistryItemDefinition[];
 };
 
-export type RegistryItemFileJson = RegistryFileDefinition & {
+type RegistryItemFileJson = RegistryFileDefinition & {
   content: string;
 };
 
-export type RegistryItemJson = Omit<RegistryItemDefinition, "files"> & {
+type RegistryItemJson = Omit<RegistryItemDefinition, "files"> & {
   $schema: typeof registryItemSchema;
   files: RegistryItemFileJson[];
 };

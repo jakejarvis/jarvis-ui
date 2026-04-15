@@ -21,7 +21,7 @@ const PACKAGE_MANAGER_STORAGE_KEY = "preferred-pm";
 const PACKAGE_MANAGER_CHANGE_EVENT = "preferred-pm-change";
 const DEFAULT_PACKAGE_MANAGER = "npm";
 
-export const packageManagers = [
+const packageManagers = [
   {
     value: "npm",
     label: "npm",
@@ -44,18 +44,18 @@ export const packageManagers = [
   },
 ] as const;
 
-export type PackageManager = (typeof packageManagers)[number]["value"];
+type PackageManager = (typeof packageManagers)[number]["value"];
 
 type InstallCommandProps = {
   item: RegistryCatalogItem;
   className?: string;
 };
 
-export function getRegistryItemUrl(itemName: string) {
+function getRegistryItemUrl(itemName: string) {
   return `${siteConfig.displayBaseUrl}${siteConfig.registryPath}/${itemName}.json`;
 }
 
-export function getInstallCommand(itemName: string, packageManager: PackageManager) {
+function getInstallCommand(itemName: string, packageManager: PackageManager) {
   const registryItemUrl = getRegistryItemUrl(itemName);
 
   switch (packageManager) {
@@ -72,7 +72,7 @@ export function getInstallCommand(itemName: string, packageManager: PackageManag
   return assertNever(packageManager);
 }
 
-export function setPackageManagerPreference(packageManager: PackageManager) {
+function setPackageManagerPreference(packageManager: PackageManager) {
   if (typeof window === "undefined") {
     return;
   }
@@ -86,7 +86,7 @@ export function setPackageManagerPreference(packageManager: PackageManager) {
   window.dispatchEvent(new Event(PACKAGE_MANAGER_CHANGE_EVENT));
 }
 
-export function getPackageManagerPreference() {
+function getPackageManagerPreference() {
   if (typeof window === "undefined") {
     return DEFAULT_PACKAGE_MANAGER;
   }
