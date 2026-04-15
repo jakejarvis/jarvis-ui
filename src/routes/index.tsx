@@ -1,18 +1,39 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { IconBrandGithub } from "@tabler/icons-react";
+import { Link, createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({ component: App });
+import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/lib/registry/catalog";
 
-function App() {
+export const Route = createFileRoute("/")({ component: HomePage });
+
+function HomePage() {
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-8">
-      <section className="flex flex-col gap-6">
-        <div className="flex flex-col gap-3">
-          <h1 className="font-heading text-4xl font-semibold text-balance">Jarvis UI</h1>
-          <p className="max-w-2xl text-muted-foreground">
-            An intentionally random collection of components likely only useful to one person (me).
-          </p>
+    <div className="flex flex-1 flex-col items-center justify-center px-4 py-24 sm:py-32">
+      <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 text-center">
+        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
+          {siteConfig.name}
+        </h1>
+        <p className="max-w-lg text-lg text-muted-foreground">{siteConfig.description}</p>
+        <div className="flex items-center gap-3">
+          <Button size="lg" render={<Link to="/components" />}>
+            Browse Components
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            render={
+              <a
+                href="https://github.com/jakejarvis/jarvis-ui"
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            }
+          >
+            <IconBrandGithub data-icon="inline-start" />
+            GitHub
+          </Button>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

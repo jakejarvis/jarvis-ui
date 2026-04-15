@@ -58,6 +58,7 @@ const config = defineConfig({
     },
     rules: {
       "react/react-in-jsx-scope": "off",
+      "jsx-a11y/anchor-has-content": "off",
     },
     overrides: [
       {

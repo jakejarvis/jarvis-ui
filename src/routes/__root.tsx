@@ -3,7 +3,7 @@ import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-r
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Analytics } from "@vercel/analytics/react";
 
-import { DocsShell } from "@/components/docs/docs-shell";
+import { SiteHeader } from "@/components/docs/site-header";
 import { ThemeProvider, themeScript } from "@/components/docs/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -38,9 +38,8 @@ function RootRoute() {
   return (
     <ThemeProvider>
       <TooltipProvider>
-        <DocsShell>
-          <Outlet />
-        </DocsShell>
+        <SiteHeader />
+        <Outlet />
       </TooltipProvider>
     </ThemeProvider>
   );

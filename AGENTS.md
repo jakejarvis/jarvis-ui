@@ -14,3 +14,31 @@ skills:
   - task: "work on Vite+ development workflow or CLI operations"
     load: "node_modules/vite-plus/skills/vite-plus/SKILL.md"
 <!-- intent-skills:end -->
+
+# Agent Instructions
+
+## Package Manager
+Use **Vite+**: `vp install`, `vp dev`, `vp build`, `vp test`
+
+## Tooling
+- **Vite+** (`vp`): dev/build/test/lint/fmt — config in `vite.config.ts`
+- **Registry**: `vp run registry:generate` after changing `registry/` items; `vp run registry:build` for shadcn build / `public/r/`
+
+## File-Scoped Commands
+| Task | Command |
+|------|---------|
+| Check (fmt + lint + types) | `vp check path/to/file.tsx` |
+| Check with auto-fix | `vp check --fix path/to/file.tsx` |
+| Tests (filter) | `vp test run path/to/file.test.ts` |
+
+## Commit Attribution
+AI commits MUST include:
+```
+Co-Authored-By: (the agent's name and attribution byline)
+```
+
+## Key Conventions
+- Routes: `src/routes/` — do not edit `src/routeTree.gen.ts`
+- Registry catalog: `src/lib/registry/catalog.ts`; item sources under `registry/base-nova/`
+- Docs chrome: `src/components/docs/`; shadcn UI: `src/components/ui/`; theme/CSS: `src/styles.css`
+- See `README.md` for TanStack Start / routing overview

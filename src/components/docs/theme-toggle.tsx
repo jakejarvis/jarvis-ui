@@ -9,7 +9,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 
 import { useTheme } from "./theme-provider";
 
@@ -42,13 +41,11 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<Button variant="outline" className={cn("justify-start", className)} />}
-      >
-        <CurrentIcon data-icon="inline-start" />
-        <span>Theme</span>
+      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className={className} />}>
+        <CurrentIcon />
+        <span className="sr-only">Toggle theme</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-44">
+      <DropdownMenuContent align="end" className="min-w-44">
         <DropdownMenuGroup>
           <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
             {themeOptions.map((option) => {
