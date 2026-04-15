@@ -1,4 +1,4 @@
-import { IconBook, IconCode, IconExternalLink } from "@tabler/icons-react";
+import { IconBook, IconCode } from "@tabler/icons-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import * as React from "react";
 
@@ -91,8 +91,7 @@ function DocsSidebar() {
                   render={
                     <a href="/r/registry.json">
                       <IconCode />
-                      <span className="font-mono">registry.json</span>
-                      <IconExternalLink />
+                      <span className="font-mono text-xs">registry.json</span>
                     </a>
                   }
                 />
@@ -102,18 +101,9 @@ function DocsSidebar() {
         </SidebarGroup>
         <SidebarSeparator />
         <SidebarGroup>
-          <SidebarGroupLabel>Components</SidebarGroupLabel>
+          <SidebarGroupLabel render={<Link to="/components" />}>Components</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={pathname === "/components/"}
-                  tooltip="Components"
-                  render={<Link to="/components" />}
-                >
-                  <span>All components</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
               {componentItems.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton
@@ -130,18 +120,9 @@ function DocsSidebar() {
         </SidebarGroup>
         <SidebarSeparator />
         <SidebarGroup>
-          <SidebarGroupLabel>Blocks</SidebarGroupLabel>
+          <SidebarGroupLabel render={<Link to="/blocks" />}>Blocks</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={pathname === "/blocks/"}
-                  tooltip="Blocks"
-                  render={<Link to="/blocks" />}
-                >
-                  <span>All blocks</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
               {blockItems.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton

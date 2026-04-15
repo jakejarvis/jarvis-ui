@@ -1,4 +1,4 @@
-import { IconCheck, IconChevronDown, IconCopy, IconPackage } from "@tabler/icons-react";
+import { IconCheck, IconChevronDown, IconCopy } from "@tabler/icons-react";
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -121,11 +121,6 @@ export function InstallCommand({ item, className }: InstallCommandProps) {
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <IconPackage data-icon="inline-start" />
-        Install
-      </div>
-
       <div className="overflow-hidden rounded-lg border bg-muted/40">
         <div className="flex min-h-10 items-center justify-between gap-2 border-b px-2">
           <DropdownMenu>

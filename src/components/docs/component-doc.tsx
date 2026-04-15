@@ -36,12 +36,12 @@ export function RegistryItemDoc({ item }: RegistryItemDocProps) {
             <CardTitle>Usage</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="usage">
+            <Tabs defaultValue="example">
               <TabsList>
-                <TabsTrigger value="usage">Usage</TabsTrigger>
+                <TabsTrigger value="example">Example</TabsTrigger>
                 <TabsTrigger value="source">Source</TabsTrigger>
               </TabsList>
-              <TabsContent value="usage">
+              <TabsContent value="example">
                 <CodeBlock code={item.usage} label="Example" />
               </TabsContent>
               <TabsContent value="source" className="flex flex-col gap-4">
