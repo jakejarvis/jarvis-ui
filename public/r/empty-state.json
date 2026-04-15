@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "empty-state",
+  "title": "Empty State",
+  "description": "A centered empty state for dashboards, tables, and registry sections.",
+  "registryDependencies": ["button"],
+  "files": [
+    {
+      "path": "registry/base-nova/empty-state/empty-state.tsx",
+      "content": "import { Button } from \"@/components/ui/button\";\n\ntype EmptyStateProps = {\n  title?: string;\n  description?: string;\n  actionLabel?: string;\n};\n\nexport function EmptyState({\n  title = \"No components yet\",\n  description = \"Add your first registry item to start building a reusable component system.\",\n  actionLabel = \"Create component\",\n}: EmptyStateProps) {\n  return (\n    <section className=\"flex w-full max-w-md flex-col items-center gap-4 rounded-lg border bg-card p-8 text-center text-card-foreground\">\n      <div className=\"flex size-12 items-center justify-center rounded-lg border bg-muted font-heading text-sm font-medium text-muted-foreground\">\n        UI\n      </div>\n      <div className=\"flex flex-col gap-1\">\n        <h3 className=\"font-heading text-lg font-medium\">{title}</h3>\n        <p className=\"text-sm text-muted-foreground\">{description}</p>\n      </div>\n      <Button size=\"sm\">{actionLabel}</Button>\n    </section>\n  );\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

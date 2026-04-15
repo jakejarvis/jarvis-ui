@@ -11,10 +11,17 @@ const config = defineConfig({
     "*": "vp check --fix",
   },
   fmt: {
-    ignorePatterns: ["src/routeTree.gen.ts", "AGENTS.md", "README.md", ".cta.json"],
+    ignorePatterns: [
+      "src/routeTree.gen.ts",
+      "AGENTS.md",
+      "README.md",
+      ".cta.json",
+      "public/registry.json",
+      "public/r/**/*",
+    ],
   },
   lint: {
-    ignorePatterns: ["src/routeTree.gen.ts"],
+    ignorePatterns: ["src/routeTree.gen.ts", "public/registry.json", "public/r/**/*"],
     options: { typeAware: true, typeCheck: true },
   },
   resolve: { tsconfigPaths: true },

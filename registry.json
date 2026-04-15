@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "jarvis-ui",
+  "homepage": "https://your-domain.com",
+  "items": [
+    {
+      "name": "metric-card",
+      "type": "registry:component",
+      "title": "Metric Card",
+      "description": "A compact metric card with a trend badge and supporting copy.",
+      "registryDependencies": ["card", "badge"],
+      "files": [
+        {
+          "path": "registry/base-nova/metric-card/metric-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "notice-banner",
+      "type": "registry:component",
+      "title": "Notice Banner",
+      "description": "A responsive announcement banner with a badge, message, and action.",
+      "registryDependencies": ["badge", "button"],
+      "files": [
+        {
+          "path": "registry/base-nova/notice-banner/notice-banner.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "empty-state",
+      "type": "registry:component",
+      "title": "Empty State",
+      "description": "A centered empty state for dashboards, tables, and registry sections.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/base-nova/empty-state/empty-state.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

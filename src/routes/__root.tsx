@@ -1,6 +1,10 @@
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
+import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+
+import { DocsShell } from "@/components/docs/docs-shell";
+import { ThemeProvider, themeScript } from "@/components/docs/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 import appCss from "../styles.css?url";
 
@@ -15,7 +19,11 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Jarvis UI Registry",
+      },
+      {
+        name: "description",
+        content: "A minimal documentation site and shadcn-compatible component registry.",
       },
     ],
     links: [
@@ -25,13 +33,27 @@ export const Route = createRootRoute({
       },
     ],
   }),
+  component: RootRoute,
   shellComponent: RootDocument,
 });
+
+function RootRoute() {
+  return (
+    <ThemeProvider>
+      <TooltipProvider>
+        <DocsShell>
+          <Outlet />
+        </DocsShell>
+      </TooltipProvider>
+    </ThemeProvider>
+  );
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <HeadContent />
       </head>
       <body className="font-sans antialiased [overflow-wrap:anywhere]">
