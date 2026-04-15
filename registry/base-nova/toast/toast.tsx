@@ -69,15 +69,22 @@ export interface PromiseToastOptions<T> {
   error: PromiseState<unknown>;
 }
 
-// ---------------------------------------------------------------------------
-// Global singleton manager + active toast tracking
-// ---------------------------------------------------------------------------
+type PromiseToastStateData = {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  type: string;
+  data: ToastData;
+};
+
+type MappedPromiseState<T> =
+  | string
+  | PromiseToastStateData
+  | ((value: T) => string | PromiseToastStateData);
 
 const toastManager = ToastPrimitive.createToastManager<ToastData>();
-
-/** Track active toast IDs so we can dismiss-all without React context */
 const activeToastIds = new Set<string>();
 
+// Base UI exposes this subscription hook under a key with a leading space.
 toastManager[" subscribe"]((event: { action: string; options?: { id?: string } }) => {
   const id = event.options?.id;
 
@@ -92,10 +99,6 @@ toastManager[" subscribe"]((event: { action: string; options?: { id?: string } }
     activeToastIds.delete(id);
   }
 });
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
 
 function createToast(
   message: React.ReactNode,
@@ -127,21 +130,7 @@ function createToast(
   return id;
 }
 
-/**
- * Normalize a promise state option (string | object | function) into the
- * shape Base UI's `promise()` expects.
- */
-function mapPromiseState<T>(
-  state: PromiseState<T>,
-  type: ToastType,
-):
-  | string
-  | { title?: React.ReactNode; description?: React.ReactNode; type: string; data: ToastData }
-  | ((
-      value: T,
-    ) =>
-      | string
-      | { title?: React.ReactNode; description?: React.ReactNode; type: string; data: ToastData }) {
+function mapPromiseState<T>(state: PromiseState<T>, type: ToastType): MappedPromiseState<T> {
   if (typeof state === "string") {
     return state;
   }
@@ -149,34 +138,33 @@ function mapPromiseState<T>(
   if (typeof state === "function") {
     return (value: T) => {
       const result = state(value);
-      if (typeof result === "string") return result;
-      return {
-        title: result.title,
-        description: result.description,
-        type,
-        data: { type },
-      };
+
+      if (typeof result === "string") {
+        return result;
+      }
+
+      return toPromiseToastStateData(result, type);
     };
   }
 
-  return {
-    title: state.title,
-    description: state.description,
-    type,
-    data: { type },
-  };
+  return toPromiseToastStateData(state, type);
 }
 
 function mapStaticPromiseState(
   state: string | PromiseStateOption,
   type: ToastType,
-):
-  | string
-  | { title?: React.ReactNode; description?: React.ReactNode; type: string; data: ToastData } {
+): string | PromiseToastStateData {
   if (typeof state === "string") {
     return state;
   }
 
+  return toPromiseToastStateData(state, type);
+}
+
+function toPromiseToastStateData(
+  state: PromiseStateOption,
+  type: ToastType,
+): PromiseToastStateData {
   return {
     title: state.title,
     description: state.description,
@@ -184,10 +172,6 @@ function mapStaticPromiseState(
     data: { type },
   };
 }
-
-// ---------------------------------------------------------------------------
-// Public toast API
-// ---------------------------------------------------------------------------
 
 function toast(message: React.ReactNode, options?: ToastOptions): string {
   return createToast(message, options, "default");
@@ -230,11 +214,7 @@ toast.dismiss = (id?: string): void => {
 
 export { toast };
 
-// ---------------------------------------------------------------------------
-// Default icon map
-// ---------------------------------------------------------------------------
-
-const defaultIcons: Record<string, React.ReactNode> = {
+const defaultIcons: Partial<Record<ToastType, React.ReactNode>> = {
   success: <IconCircleCheck />,
   error: <IconCircleX />,
   warning: <IconAlertTriangle />,
@@ -242,11 +222,7 @@ const defaultIcons: Record<string, React.ReactNode> = {
   loading: <Spinner />,
 };
 
-// ---------------------------------------------------------------------------
-// Rich color styles per type
-// ---------------------------------------------------------------------------
-
-const richColorStyles: Record<string, string> = {
+const richColorStyles: Partial<Record<ToastType, string>> = {
   success:
     "bg-emerald-50 border-emerald-200 text-emerald-900 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-100",
   error:
@@ -256,11 +232,7 @@ const richColorStyles: Record<string, string> = {
   info: "bg-blue-50 border-blue-200 text-blue-900 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100",
 };
 
-// ---------------------------------------------------------------------------
-// Icon color styles (used when richColors is off, to still tint the icon)
-// ---------------------------------------------------------------------------
-
-const iconColorStyles: Record<string, string> = {
+const iconColorStyles: Partial<Record<ToastType, string>> = {
   success: "text-emerald-500",
   error: "text-red-500",
   warning: "text-amber-500",
@@ -281,10 +253,6 @@ function getToastType(value: unknown): ToastType {
   }
 }
 
-// ---------------------------------------------------------------------------
-// ToastCard
-// ---------------------------------------------------------------------------
-
 interface ToastCardProps {
   toast: ToastObject<ToastData>;
   icons?: Partial<Record<ToastType, React.ReactNode>>;
@@ -299,11 +267,8 @@ function ToastCard({ toast: t, icons, closeButton = false, richColors = false }:
   const cancel = t.data?.cancel;
   const showClose = closeButton || t.data?.closeButton;
   const useRichColors = richColors || t.data?.richColors;
-
-  const colorStyles =
-    useRichColors && type in richColorStyles
-      ? richColorStyles[type]
-      : "bg-background text-foreground border-border";
+  const colorStyles = useRichColors ? richColorStyles[type] : undefined;
+  const iconColorStyle = !useRichColors ? iconColorStyles[type] : undefined;
 
   return (
     <ToastPrimitive.Root
@@ -311,29 +276,17 @@ function ToastCard({ toast: t, icons, closeButton = false, richColors = false }:
       swipeDirection="right"
       className={cn(
         "toast-root group rounded-lg border bg-clip-padding p-4 shadow-lg",
-        colorStyles,
+        colorStyles ?? "border-border bg-background text-foreground",
       )}
     >
       <ToastPrimitive.Content className="toast-content">
-        {/* Icon */}
-        {icon && (
-          <div
-            className={cn(
-              "shrink-0 [&>svg]:size-4",
-              !useRichColors && type in iconColorStyles ? iconColorStyles[type] : "",
-            )}
-          >
-            {icon}
-          </div>
-        )}
+        {icon && <div className={cn("shrink-0 [&>svg]:size-4", iconColorStyle)}>{icon}</div>}
 
-        {/* Text */}
         <div className="min-w-0 flex-1 space-y-1">
           <ToastPrimitive.Title className="text-sm leading-tight font-medium" />
           <ToastPrimitive.Description className="text-sm leading-tight opacity-70" />
         </div>
 
-        {/* Action buttons */}
         {(action || cancel) && (
           <div className="flex shrink-0 items-center gap-2">
             {action && (
@@ -353,7 +306,6 @@ function ToastCard({ toast: t, icons, closeButton = false, richColors = false }:
         )}
       </ToastPrimitive.Content>
 
-      {/* Close button */}
       {showClose && (
         <ToastPrimitive.Close
           aria-label="Close toast"
@@ -365,10 +317,6 @@ function ToastCard({ toast: t, icons, closeButton = false, richColors = false }:
     </ToastPrimitive.Root>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Toaster styles
-// ---------------------------------------------------------------------------
 
 const toasterStyles = `
   /* ---- Viewport ---- */
@@ -533,10 +481,6 @@ const toasterStyles = `
   }
 `;
 
-// ---------------------------------------------------------------------------
-// Toast list (needs React context from Provider)
-// ---------------------------------------------------------------------------
-
 function ToastList({
   icons,
   closeButton,
@@ -558,10 +502,6 @@ function ToastList({
     />
   ));
 }
-
-// ---------------------------------------------------------------------------
-// Toaster
-// ---------------------------------------------------------------------------
 
 interface ToasterProps {
   /**
@@ -617,7 +557,6 @@ function Toaster({
 }: ToasterProps) {
   return (
     <ToastPrimitive.Provider toastManager={toastManager} timeout={duration} limit={visibleToasts}>
-      {/* Inject styles */}
       <style href="toast" precedence="default">
         {toasterStyles}
       </style>

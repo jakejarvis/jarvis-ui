@@ -32,12 +32,14 @@ describe("registry catalog", () => {
   });
 
   test("orders registry item lists alphabetically", () => {
+    const registryIndexItems = getRegistryIndexJson().items;
+
     expect(registryItems.map((item) => item.name)).toEqual(getAlphabetizedItemNames(registryItems));
     expect(registryMetadataItems.map((item) => item.name)).toEqual(
       getAlphabetizedItemNames(registryMetadataItems),
     );
-    expect(getRegistryIndexJson().items.map((item) => item.name)).toEqual(
-      getAlphabetizedItemNames(getRegistryIndexJson().items),
+    expect(registryIndexItems.map((item) => item.name)).toEqual(
+      getAlphabetizedItemNames(registryIndexItems),
     );
 
     for (const type of ["registry:block", "registry:component"] as const) {
@@ -152,7 +154,7 @@ describe("registry catalog", () => {
   });
 });
 
-function getRegistryItemByName(name: string) {
+function getRegistryItemByName(name: string): (typeof registryItems)[number] {
   const item = registryItems.find((registryItem) => registryItem.name === name);
 
   if (!item) {
@@ -162,14 +164,14 @@ function getRegistryItemByName(name: string) {
   return item;
 }
 
-function getAlphabetizedItemNames(items: Array<{ name: string; title: string }>) {
+function getAlphabetizedItemNames(items: Array<{ name: string; title: string }>): string[] {
   return items.toSorted(compareRegistryItemNames).map((item) => item.name);
 }
 
 function compareRegistryItemNames(
   a: { name: string; title: string },
   b: { name: string; title: string },
-) {
+): number {
   return (
     registryItemCollator.compare(a.title, b.title) || registryItemCollator.compare(a.name, b.name)
   );
@@ -180,11 +182,12 @@ function toRegistryFileDefinition(file: {
   type: string;
   target?: string;
   content: string;
-}) {
-  return file.target
-    ? { path: file.path, type: file.type, target: file.target }
-    : {
-        path: file.path,
-        type: file.type,
-      };
+}): { path: string; type: string; target?: string } {
+  const { path, type, target } = file;
+
+  if (target) {
+    return { path, type, target };
+  }
+
+  return { path, type };
 }

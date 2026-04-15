@@ -191,8 +191,7 @@ function StepperItem({
   ...props
 }: StepperItemProps) {
   const { activeStep } = useStepper();
-  const state =
-    completed || step < activeStep ? "completed" : activeStep === step ? "active" : "inactive";
+  const state = getStepState({ completed, step, activeStep });
   const isLoading = loading && step === activeStep;
   const contextValue = React.useMemo<StepItemContextValue>(
     () => ({ step, state, isDisabled: disabled, isLoading }),
@@ -256,7 +255,7 @@ function StepperTrigger({ render, className, children, tabIndex, ...props }: Ste
     id: triggerId,
     "aria-selected": isSelected,
     "aria-controls": panelId,
-    tabIndex: typeof tabIndex === "number" ? tabIndex : isSelected ? 0 : -1,
+    tabIndex: getTriggerTabIndex(tabIndex, isSelected),
     "data-slot": "stepper-trigger",
     "data-state": state,
     "data-loading": isLoading ? "" : undefined,
@@ -469,11 +468,42 @@ function countStepperItems(node: React.ReactNode): number {
   return count;
 }
 
-function getTriggerId(step: number) {
+function getStepState({
+  completed,
+  step,
+  activeStep,
+}: {
+  completed: boolean;
+  step: number;
+  activeStep: number;
+}): StepState {
+  if (completed || step < activeStep) {
+    return "completed";
+  }
+
+  if (activeStep === step) {
+    return "active";
+  }
+
+  return "inactive";
+}
+
+function getTriggerTabIndex(
+  tabIndex: StepperTriggerProps["tabIndex"],
+  isSelected: boolean,
+): number {
+  if (typeof tabIndex === "number") {
+    return tabIndex;
+  }
+
+  return isSelected ? 0 : -1;
+}
+
+function getTriggerId(step: number): string {
   return `stepper-tab-${step}`;
 }
 
-function getPanelId(step: number) {
+function getPanelId(step: number): string {
   return `stepper-panel-${step}`;
 }
 

@@ -24,6 +24,11 @@ type RegistryItemJson = Omit<RegistryItemDefinition, "files"> & {
   files: RegistryItemFileJson[];
 };
 
+type RegistryItemDependencyFields = Pick<
+  RegistryItemDefinition,
+  "dependencies" | "devDependencies" | "registryDependencies"
+>;
+
 export function getRegistryIndexJson(): RegistryIndexJson {
   return {
     ...registryConfig,
@@ -37,7 +42,7 @@ export function getRegistryItemJson(name: string): RegistryItemJson | null {
   return item ? toRegistryItemJson(item) : null;
 }
 
-export function getRegistryValidationErrors() {
+export function getRegistryValidationErrors(): string[] {
   const errors: string[] = [];
   const names = new Map<string, string>();
 
@@ -105,19 +110,8 @@ function toRegistryItemJson(item: RegistryCatalogItem): RegistryItemJson {
     description: item.description,
     files: itemWithSources.sourceFiles.map(toRegistryItemFileJson),
     type: item.type,
+    ...getRegistryItemDependencyFields(item),
   };
-
-  if (item.dependencies) {
-    registryItem.dependencies = item.dependencies;
-  }
-
-  if (item.devDependencies) {
-    registryItem.devDependencies = item.devDependencies;
-  }
-
-  if (item.registryDependencies) {
-    registryItem.registryDependencies = item.registryDependencies;
-  }
 
   return registryItem;
 }
@@ -129,21 +123,30 @@ function toRegistryItemDefinition(item: RegistryCatalogItem): RegistryItemDefini
     title: item.title,
     description: item.description,
     files: item.files,
+    ...getRegistryItemDependencyFields(item),
   };
 
+  return registryItem;
+}
+
+function getRegistryItemDependencyFields(
+  item: RegistryCatalogItem,
+): Partial<RegistryItemDependencyFields> {
+  const dependencyFields: Partial<RegistryItemDependencyFields> = {};
+
   if (item.dependencies) {
-    registryItem.dependencies = item.dependencies;
+    dependencyFields.dependencies = item.dependencies;
   }
 
   if (item.devDependencies) {
-    registryItem.devDependencies = item.devDependencies;
+    dependencyFields.devDependencies = item.devDependencies;
   }
 
   if (item.registryDependencies) {
-    registryItem.registryDependencies = item.registryDependencies;
+    dependencyFields.registryDependencies = item.registryDependencies;
   }
 
-  return registryItem;
+  return dependencyFields;
 }
 
 function toRegistryItemFileJson(

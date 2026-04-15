@@ -40,7 +40,7 @@ export function getRegistryItemWithSources(
   };
 }
 
-export function getMissingRegistrySourcePaths() {
+export function getMissingRegistrySourcePaths(): string[] {
   return registryItems.flatMap((item) =>
     getRegistryItemWithSources(item)
       .sourceFiles.filter((file) => file.source.length === 0)
@@ -48,7 +48,7 @@ export function getMissingRegistrySourcePaths() {
   );
 }
 
-export function getMissingRegistryPreviewPaths() {
+export function getMissingRegistryPreviewPaths(): string[] {
   return registryItems.flatMap((item) => {
     const itemWithSources = getRegistryItemWithSources(item);
 
@@ -58,19 +58,19 @@ export function getMissingRegistryPreviewPaths() {
   });
 }
 
-function normalizeGlobFiles<T>(files: Record<string, T>) {
+function normalizeGlobFiles<T>(files: Record<string, T>): Record<string, T> {
   return Object.fromEntries(
     Object.entries(files).map(([path, source]) => [normalizeGlobPath(path), source]),
   );
 }
 
-function getRegistrySource(path: string) {
+function getRegistrySource(path: string): string {
   const source = registrySourceByPath[path];
 
   return source ? trimBlankTrailingLines(source) : "";
 }
 
-export function trimBlankTrailingLines(source: string) {
+export function trimBlankTrailingLines(source: string): string {
   const lines = source.split(/\r?\n/u);
 
   while (lines.length > 0 && lines[lines.length - 1]?.trim() === "") {
@@ -80,6 +80,6 @@ export function trimBlankTrailingLines(source: string) {
   return lines.join("\n");
 }
 
-function normalizeGlobPath(path: string) {
-  return path.replace(/^(\.\.\/){3}/, "");
+function normalizeGlobPath(path: string): string {
+  return path.replace(/^(?:\.\.\/){3}/u, "");
 }

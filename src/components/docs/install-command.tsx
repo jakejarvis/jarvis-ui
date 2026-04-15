@@ -1,7 +1,8 @@
-import { IconCheck, IconChevronDown, IconCopy } from "@tabler/icons-react";
+import { IconChevronDown } from "@tabler/icons-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/ui/copy-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,17 +46,21 @@ const packageManagers = [
 ] as const;
 
 type PackageManager = (typeof packageManagers)[number]["value"];
+type PackageManagerPreference = readonly [
+  PackageManager,
+  (nextPackageManager: PackageManager) => void,
+];
 
 type InstallCommandProps = {
   item: RegistryCatalogItem;
   className?: string;
 };
 
-function getRegistryItemUrl(itemName: string) {
+function getRegistryItemUrl(itemName: string): string {
   return `${siteConfig.displayBaseUrl}${siteConfig.registryPath}/${itemName}.json`;
 }
 
-function getInstallCommand(itemName: string, packageManager: PackageManager) {
+function getInstallCommand(itemName: string, packageManager: PackageManager): string {
   const registryItemUrl = getRegistryItemUrl(itemName);
 
   switch (packageManager) {
@@ -72,7 +77,7 @@ function getInstallCommand(itemName: string, packageManager: PackageManager) {
   return assertNever(packageManager);
 }
 
-function setPackageManagerPreference(packageManager: PackageManager) {
+function setPackageManagerPreference(packageManager: PackageManager): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -86,7 +91,7 @@ function setPackageManagerPreference(packageManager: PackageManager) {
   window.dispatchEvent(new Event(PACKAGE_MANAGER_CHANGE_EVENT));
 }
 
-function getPackageManagerPreference() {
+function getPackageManagerPreference(): PackageManager {
   if (typeof window === "undefined") {
     return DEFAULT_PACKAGE_MANAGER;
   }
@@ -102,21 +107,10 @@ function getPackageManagerPreference() {
 
 export function InstallCommand({ item, className }: InstallCommandProps) {
   const [packageManager, setPackageManager] = usePackageManagerPreference();
-  const [copied, setCopied] = React.useState(false);
   const selectedPackageManager =
     packageManagers.find((option) => option.value === packageManager) ?? packageManagers[0];
   const command = getInstallCommand(item.name, packageManager);
   const SelectedLogo = selectedPackageManager.logo;
-
-  async function copyCommand() {
-    if (!navigator.clipboard) {
-      return;
-    }
-
-    await navigator.clipboard.writeText(command);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1200);
-  }
 
   return (
     <div className={cn("min-w-0 overflow-hidden rounded-lg border bg-muted/40", className)}>
@@ -152,10 +146,14 @@ export function InstallCommand({ item, className }: InstallCommandProps) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="ghost" size="icon-sm" onClick={() => void copyCommand()}>
-          {copied ? <IconCheck /> : <IconCopy />}
-          <span className="sr-only">Copy install command</span>
-        </Button>
+        <CopyButton
+          value={command}
+          copyLabel="Copy install command"
+          copiedLabel="Copied"
+          resetDelay={1200}
+          variant="ghost"
+          size="icon-sm"
+        />
       </div>
       <pre className="overflow-x-auto p-4 text-sm leading-6">
         <code>{command}</code>
@@ -164,7 +162,7 @@ export function InstallCommand({ item, className }: InstallCommandProps) {
   );
 }
 
-function usePackageManagerPreference() {
+function usePackageManagerPreference(): PackageManagerPreference {
   const [packageManager, setPackageManagerState] = React.useState<PackageManager>(
     getPackageManagerPreference,
   );

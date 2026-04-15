@@ -53,39 +53,43 @@ export type RegistryCatalogItem = RegistryItem & {
   previewSourceFile: RegistryPreviewSourceFile;
 };
 
-export const registryItems = registryMetadataItems.map((item) =>
-  Object.assign({}, item, {
-    sourceFiles: item.files.map((file) =>
-      Object.assign({}, file, {
-        fileName: getFileName(file.path),
-      }),
-    ),
-    previewSourceFile: getPreviewSourceFile(item),
-  }),
-) satisfies RegistryCatalogItem[];
+export const registryItems = registryMetadataItems.map(toRegistryCatalogItem);
 
-export function getRegistryItem(name: string) {
+function toRegistryCatalogItem(item: RegistryItem): RegistryCatalogItem {
+  return Object.assign({}, item, {
+    sourceFiles: item.files.map(toRegistrySourceFile),
+    previewSourceFile: getPreviewSourceFile(item),
+  });
+}
+
+function toRegistrySourceFile(file: RegistryFile): RegistrySourceFile {
+  return Object.assign({}, file, {
+    fileName: getFileName(file.path),
+  });
+}
+
+export function getRegistryItem(name: string): RegistryCatalogItem | undefined {
   return registryItems.find((item) => item.name === name);
 }
 
-export function getRegistryItemsByType(type: RegistryType) {
+export function getRegistryItemsByType(type: RegistryType): RegistryCatalogItem[] {
   return registryItems.filter((item) => item.type === type);
 }
 
-function normalizeGlobFiles<T>(files: Record<string, T>) {
+function normalizeGlobFiles<T>(files: Record<string, T>): Record<string, T> {
   return Object.fromEntries(
     Object.entries(files).map(([path, source]) => [normalizeGlobPath(path), source]),
   );
 }
 
-function normalizeGlobPath(path: string) {
-  return path.replace(/^(\.\.\/){3}/, "");
+function normalizeGlobPath(path: string): string {
+  return path.replace(/^(?:\.\.\/){3}/u, "");
 }
 
 function compareRegistryItemNames(
   a: Pick<RegistryItemDefinition, "name" | "title">,
   b: Pick<RegistryItemDefinition, "name" | "title">,
-) {
+): number {
   return (
     registryItemCollator.compare(a.title, b.title) || registryItemCollator.compare(a.name, b.name)
   );
@@ -100,7 +104,7 @@ function getPreviewSourceFile(item: RegistryItem): RegistryPreviewSourceFile {
   };
 }
 
-function getRegistryItemRoot(item: RegistryItem) {
+function getRegistryItemRoot(item: RegistryItem): string {
   const [firstFile] = item.files;
 
   if (!firstFile) {
@@ -117,6 +121,6 @@ function getRegistryItemRoot(item: RegistryItem) {
   return segments.slice(0, itemNameIndex + 1).join("/");
 }
 
-function getFileName(path: string) {
+function getFileName(path: string): string {
   return path.split("/").at(-1) ?? path;
 }
