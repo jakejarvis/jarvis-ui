@@ -3,7 +3,10 @@
   "name": "metric-card",
   "title": "Metric Card",
   "description": "A compact metric card with a trend badge and supporting copy.",
-  "registryDependencies": ["card", "badge"],
+  "registryDependencies": [
+    "card",
+    "badge"
+  ],
   "files": [
     {
       "path": "registry/base-nova/metric-card/metric-card.tsx",

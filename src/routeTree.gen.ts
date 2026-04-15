@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsIndexRouteImport } from './routes/components.index'
+import { Route as BlocksIndexRouteImport } from './routes/blocks.index'
 import { Route as ComponentsNameRouteImport } from './routes/components.$name'
+import { Route as BlocksNameRouteImport } from './routes/blocks.$name'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,39 +25,68 @@ const ComponentsIndexRoute = ComponentsIndexRouteImport.update({
   path: '/components/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlocksIndexRoute = BlocksIndexRouteImport.update({
+  id: '/blocks/',
+  path: '/blocks/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsNameRoute = ComponentsNameRouteImport.update({
   id: '/components/$name',
   path: '/components/$name',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlocksNameRoute = BlocksNameRouteImport.update({
+  id: '/blocks/$name',
+  path: '/blocks/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/blocks/$name': typeof BlocksNameRoute
   '/components/$name': typeof ComponentsNameRoute
+  '/blocks/': typeof BlocksIndexRoute
   '/components/': typeof ComponentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/blocks/$name': typeof BlocksNameRoute
   '/components/$name': typeof ComponentsNameRoute
+  '/blocks': typeof BlocksIndexRoute
   '/components': typeof ComponentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/blocks/$name': typeof BlocksNameRoute
   '/components/$name': typeof ComponentsNameRoute
+  '/blocks/': typeof BlocksIndexRoute
   '/components/': typeof ComponentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/components/$name' | '/components/'
+  fullPaths:
+    | '/'
+    | '/blocks/$name'
+    | '/components/$name'
+    | '/blocks/'
+    | '/components/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/components/$name' | '/components'
-  id: '__root__' | '/' | '/components/$name' | '/components/'
+  to: '/' | '/blocks/$name' | '/components/$name' | '/blocks' | '/components'
+  id:
+    | '__root__'
+    | '/'
+    | '/blocks/$name'
+    | '/components/$name'
+    | '/blocks/'
+    | '/components/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BlocksNameRoute: typeof BlocksNameRoute
   ComponentsNameRoute: typeof ComponentsNameRoute
+  BlocksIndexRoute: typeof BlocksIndexRoute
   ComponentsIndexRoute: typeof ComponentsIndexRoute
 }
 
@@ -75,6 +106,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blocks/': {
+      id: '/blocks/'
+      path: '/blocks'
+      fullPath: '/blocks/'
+      preLoaderRoute: typeof BlocksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/$name': {
       id: '/components/$name'
       path: '/components/$name'
@@ -82,12 +120,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsNameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blocks/$name': {
+      id: '/blocks/$name'
+      path: '/blocks/$name'
+      fullPath: '/blocks/$name'
+      preLoaderRoute: typeof BlocksNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BlocksNameRoute: BlocksNameRoute,
   ComponentsNameRoute: ComponentsNameRoute,
+  BlocksIndexRoute: BlocksIndexRoute,
   ComponentsIndexRoute: ComponentsIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -19,7 +19,7 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { siteConfig, registryItems } from "@/lib/registry/catalog";
+import { getRegistryItemsByType, siteConfig } from "@/lib/registry/catalog";
 
 import { ThemeToggle } from "./theme-toggle";
 
@@ -54,6 +54,8 @@ function DocsSidebar() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
+  const componentItems = getRegistryItemsByType("registry:component");
+  const blockItems = getRegistryItemsByType("registry:block");
 
   return (
     <>
@@ -98,12 +100,49 @@ function DocsSidebar() {
           <SidebarGroupLabel>Components</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {registryItems.map((item) => (
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={pathname === "/components/"}
+                  tooltip="Components"
+                  render={<Link to="/components" />}
+                >
+                  <span>All components</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {componentItems.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton
                     isActive={pathname === `/components/${item.name}`}
                     tooltip={item.title}
                     render={<Link to="/components/$name" params={{ name: item.name }} />}
+                  >
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarSeparator />
+        <SidebarGroup>
+          <SidebarGroupLabel>Blocks</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={pathname === "/blocks/"}
+                  tooltip="Blocks"
+                  render={<Link to="/blocks" />}
+                >
+                  <span>All blocks</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {blockItems.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton
+                    isActive={pathname === `/blocks/${item.name}`}
+                    tooltip={item.title}
+                    render={<Link to="/blocks/$name" params={{ name: item.name }} />}
                   >
                     <span>{item.title}</span>
                   </SidebarMenuButton>

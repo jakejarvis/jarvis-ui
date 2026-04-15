@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "status-board",
+  "title": "Status Board",
+  "description": "A reusable operations block with summary counts and prioritized status rows.",
+  "registryDependencies": [
+    "badge",
+    "button",
+    "card",
+    "separator"
+  ],
+  "files": [
+    {
+      "path": "registry/base-nova/blocks/status-board/components/status-board.tsx",
+      "content": "import { Badge } from \"@/components/ui/badge\";\nimport { Button } from \"@/components/ui/button\";\nimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from \"@/components/ui/card\";\nimport { Separator } from \"@/components/ui/separator\";\nimport {\n  defaultStatusBoardItems,\n  getStatusBoardSummary,\n  type StatusBoardItem,\n} from \"@/registry/base-nova/blocks/status-board/lib/status-board-data\";\n\ntype StatusBoardProps = {\n  title?: string;\n  description?: string;\n  actionLabel?: string;\n  items?: StatusBoardItem[];\n};\n\nexport function StatusBoard({\n  title = \"Operations status\",\n  description = \"Track the signals that need attention before the next review.\",\n  actionLabel = \"Open queue\",\n  items = defaultStatusBoardItems,\n}: StatusBoardProps) {\n  const summary = getStatusBoardSummary(items);\n\n  return (\n    <section className=\"grid w-full max-w-4xl gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]\">\n      <Card>\n        <CardHeader>\n          <CardTitle>{title}</CardTitle>\n          <CardDescription>{description}</CardDescription>\n        </CardHeader>\n        <CardContent className=\"flex flex-col gap-4\">\n          <div className=\"grid grid-cols-3 gap-2\">\n            <SummaryTile label=\"Clear\" value={summary.healthy} />\n            <SummaryTile label=\"Watch\" value={summary.watch} />\n            <SummaryTile label=\"Blocked\" value={summary.blocked} />\n          </div>\n          <Button size=\"sm\" className=\"w-fit\">\n            {actionLabel}\n          </Button>\n        </CardContent>\n      </Card>\n\n      <Card>\n        <CardHeader>\n          <CardTitle>Current signals</CardTitle>\n          <CardDescription>Sorted by the order your team reviews them.</CardDescription>\n        </CardHeader>\n        <CardContent className=\"flex flex-col\">\n          {items.map((item, index) => (\n            <div key={item.label} className=\"flex flex-col\">\n              {index > 0 ? <Separator /> : null}\n              <div className=\"grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start\">\n                <div className=\"flex min-w-0 flex-col gap-1\">\n                  <div className=\"flex flex-wrap items-center gap-2\">\n                    <span className=\"font-medium\">{item.label}</span>\n                    <StatusBadge status={item.status} />\n                  </div>\n                  <p className=\"text-sm text-muted-foreground\">{item.detail}</p>\n                </div>\n                <div className=\"text-2xl font-semibold tabular-nums\">{item.value}</div>\n              </div>\n            </div>\n          ))}\n        </CardContent>\n      </Card>\n    </section>\n  );\n}\n\nfunction SummaryTile({ label, value }: { label: string; value: number }) {\n  return (\n    <div className=\"flex flex-col gap-1 rounded-lg border bg-muted/40 p-3\">\n      <span className=\"text-xs text-muted-foreground\">{label}</span>\n      <span className=\"text-2xl font-semibold tabular-nums\">{value}</span>\n    </div>\n  );\n}\n\nfunction StatusBadge({ status }: { status: StatusBoardItem[\"status\"] }) {\n  if (status === \"blocked\") {\n    return <Badge variant=\"destructive\">Blocked</Badge>;\n  }\n\n  if (status === \"watch\") {\n    return <Badge variant=\"outline\">Watch</Badge>;\n  }\n\n  return <Badge variant=\"secondary\">Healthy</Badge>;\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/base-nova/blocks/status-board/lib/status-board-data.ts",
+      "content": "export type StatusBoardItem = {\n  label: string;\n  value: string;\n  detail: string;\n  status: \"healthy\" | \"watch\" | \"blocked\";\n};\n\nexport const defaultStatusBoardItems = [\n  {\n    label: \"Production sync\",\n    value: \"99.98%\",\n    detail: \"All regions reporting inside the expected window.\",\n    status: \"healthy\",\n  },\n  {\n    label: \"Review queue\",\n    value: \"18\",\n    detail: \"Five items are waiting on owner feedback.\",\n    status: \"watch\",\n  },\n  {\n    label: \"Incident response\",\n    value: \"2\",\n    detail: \"Follow-up actions remain assigned to support.\",\n    status: \"blocked\",\n  },\n] satisfies StatusBoardItem[];\n\nexport function getStatusBoardSummary(items: StatusBoardItem[]) {\n  return {\n    healthy: items.filter((item) => item.status === \"healthy\").length,\n    watch: items.filter((item) => item.status === \"watch\").length,\n    blocked: items.filter((item) => item.status === \"blocked\").length,\n  };\n}\n",
+      "type": "registry:lib"
+    }
+  ],
+  "type": "registry:block"
+}

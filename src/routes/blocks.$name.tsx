@@ -3,15 +3,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RegistryItemDoc, RegistryItemNotFound } from "@/components/docs/component-doc";
 import { getRegistryItem } from "@/lib/registry/catalog";
 
-export const Route = createFileRoute("/components/$name")({
-  component: ComponentRoute,
+export const Route = createFileRoute("/blocks/$name")({
+  component: BlockRoute,
 });
 
-function ComponentRoute() {
+function BlockRoute() {
   const { name } = Route.useParams();
   const item = getRegistryItem(name);
 
-  if (!item || item.type !== "registry:component") {
+  if (!item || item.type !== "registry:block") {
     return <RegistryItemNotFound name={name} />;
   }
 

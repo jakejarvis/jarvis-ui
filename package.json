@@ -7,7 +7,7 @@
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test run",
-    "registry:build": "shadcn build && cp public/r/registry.json public/registry.json && vp fmt public/r public/registry.json --write",
+    "registry:build": "shadcn build && cp public/r/registry.json public/registry.json",
     "prepare": "vp config"
   },
   "dependencies": {

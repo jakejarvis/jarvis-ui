@@ -3,7 +3,9 @@
   "name": "empty-state",
   "title": "Empty State",
   "description": "A centered empty state for dashboards, tables, and registry sections.",
-  "registryDependencies": ["button"],
+  "registryDependencies": [
+    "button"
+  ],
   "files": [
     {
       "path": "registry/base-nova/empty-state/empty-state.tsx",

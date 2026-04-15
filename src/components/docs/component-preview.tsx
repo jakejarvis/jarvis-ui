@@ -1,37 +1,46 @@
-import { EmptyState } from "../../../registry/base-nova/empty-state/empty-state";
-import { MetricCard } from "../../../registry/base-nova/metric-card/metric-card";
-import { NoticeBanner } from "../../../registry/base-nova/notice-banner/notice-banner";
+import type * as React from "react";
+
+type PreviewModule = {
+  Preview?: React.ComponentType;
+};
+
+const previewModules = import.meta.glob("../../../registry/base-nova/**/docs.tsx", {
+  eager: true,
+}) as Record<string, PreviewModule>;
+
+const previewByName = Object.fromEntries(
+  Object.entries(previewModules).flatMap(([path, module]) => {
+    const name = getRegistryItemName(path);
+
+    return name && module.Preview ? [[name, module.Preview]] : [];
+  }),
+) as Record<string, React.ComponentType | undefined>;
 
 type ComponentPreviewProps = {
   name: string;
 };
 
 export function ComponentPreview({ name }: ComponentPreviewProps) {
+  const Preview = previewByName[name];
+
   return (
     <div className="flex min-h-72 items-center justify-center rounded-lg border bg-background p-6">
-      {name === "metric-card" ? (
-        <MetricCard
-          label="Active projects"
-          value="128"
-          change="+18.4%"
-          description="Synced from connected workspaces"
-        />
-      ) : null}
-      {name === "notice-banner" ? (
-        <NoticeBanner
-          eyebrow="Registry"
-          title="Installable blocks should be boring to adopt."
-          description="Every component here is designed to copy cleanly into another shadcn project."
-          actionLabel="Install"
-        />
-      ) : null}
-      {name === "empty-state" ? (
-        <EmptyState
-          title="Nothing published"
-          description="Draft a component, add it to registry.json, then run the registry build."
-          actionLabel="Add draft"
-        />
-      ) : null}
+      {Preview ? (
+        <Preview />
+      ) : (
+        <p className="text-sm text-muted-foreground">No preview is available for this item.</p>
+      )}
     </div>
   );
+}
+
+function getRegistryItemName(path: string) {
+  const segments = path.split("/");
+  const docsIndex = segments.indexOf("docs.tsx");
+
+  if (docsIndex <= 0) {
+    return null;
+  }
+
+  return segments[docsIndex - 1];
 }

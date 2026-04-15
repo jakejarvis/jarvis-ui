@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
 
-import { getRegistryJsonItemNames, registryItems } from "@/lib/registry/catalog";
+import {
+  getMissingRegistrySourcePaths,
+  getRegistryItemsMissingUsage,
+  getRegistryJsonItemNames,
+  registryItems,
+} from "@/lib/registry/catalog";
 
 describe("registry catalog", () => {
   test("has unique item names", () => {
@@ -19,8 +24,23 @@ describe("registry catalog", () => {
   test("has install commands and snippets for every item", () => {
     for (const item of registryItems) {
       expect(item.installCommand).toContain(`/r/${item.name}.json`);
-      expect(item.source).toContain(`export function`);
       expect(item.usage).toContain(`import`);
+    }
+  });
+
+  test("loads source for every published file", () => {
+    expect(getMissingRegistrySourcePaths()).toEqual([]);
+  });
+
+  test("has usage docs for every item", () => {
+    expect(getRegistryItemsMissingUsage()).toEqual([]);
+  });
+
+  test("publishes blocks as multi-file registry items", () => {
+    const blocks = registryItems.filter((item) => item.type === "registry:block");
+
+    for (const block of blocks) {
+      expect(block.files.length).toBeGreaterThan(1);
     }
   });
 });
