@@ -1,7 +1,9 @@
+import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import viteReact from "@vitejs/plugin-react";
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
+import rsc from "@vitejs/plugin-rsc";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite-plus";
 
@@ -41,7 +43,6 @@ const config = defineConfig({
       "README.md",
       ".cta.json",
       "registry.json",
-      "public/registry.json",
       "public/r/**/*",
     ],
   },
@@ -74,15 +75,24 @@ const config = defineConfig({
         },
       },
     ],
-    ignorePatterns: [
-      "src/routeTree.gen.ts",
-      "registry.json",
-      "public/registry.json",
-      "public/r/**/*",
-    ],
+    ignorePatterns: ["src/routeTree.gen.ts", "registry.json", "public/r/**/*"],
   },
   resolve: { tsconfigPaths: true },
-  plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact(), nitro()],
+  plugins: [
+    devtools(),
+    tailwindcss(),
+    tanstackStart({
+      rsc: {
+        enabled: true,
+      },
+    }),
+    rsc(),
+    viteReact(),
+    babel({
+      presets: [reactCompilerPreset()],
+    }),
+    nitro(),
+  ],
 });
 
 export default config;

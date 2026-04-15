@@ -1,13 +1,17 @@
 import { describe, expect, test } from "vitest";
 
 import {
-  getMissingRegistryPreviewPaths,
-  getMissingRegistrySourcePaths,
   getRegistryJsonItems,
   getRegistryJsonItemNames,
   registryMetadataItems,
   registryItems,
 } from "@/lib/registry/catalog";
+import {
+  getMissingRegistryPreviewPaths,
+  getMissingRegistrySourcePaths,
+  getRegistryItemWithSources,
+  trimBlankTrailingLines,
+} from "@/lib/registry/source.server";
 
 describe("registry catalog", () => {
   test("has unique item names", () => {
@@ -35,7 +39,9 @@ describe("registry catalog", () => {
 
   test("has preview snippets for every item", () => {
     for (const item of registryItems) {
-      expect(item.previewSourceFile.source).toContain(`export function Preview`);
+      expect(getRegistryItemWithSources(item).previewSourceFile.source).toContain(
+        `export function Preview`,
+      );
     }
   });
 
@@ -45,6 +51,21 @@ describe("registry catalog", () => {
 
   test("loads preview source for every item", () => {
     expect(getMissingRegistryPreviewPaths()).toEqual([]);
+  });
+
+  test("trims blank trailing lines from imported source", () => {
+    expect(trimBlankTrailingLines("const value = 1;\n\n \n\t")).toBe("const value = 1;");
+    expect(trimBlankTrailingLines("const value = 1;  \n")).toBe("const value = 1;  ");
+
+    for (const item of registryItems) {
+      const itemWithSources = getRegistryItemWithSources(item);
+
+      expect(itemWithSources.previewSourceFile.source).not.toMatch(/\n[ \t]*$/u);
+
+      for (const file of itemWithSources.sourceFiles) {
+        expect(file.source).not.toMatch(/\n[ \t]*$/u);
+      }
+    }
   });
 
   test("publishes blocks as multi-file registry items", () => {

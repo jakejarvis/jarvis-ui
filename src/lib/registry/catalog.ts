@@ -12,17 +12,11 @@ export const siteConfig = {
 } as const;
 
 type RegistryItem = (typeof registryIndex.items)[number];
-type RegistryFile = RegistryItem["files"][number];
-type RegistryType = RegistryItem["type"];
+export type RegistryFile = RegistryItem["files"][number];
+export type RegistryType = RegistryItem["type"];
 type RegistryMetaModule = {
   registryItem?: RegistryItemDefinition;
 };
-
-const registrySources = import.meta.glob<string>("../../../registry/**/*.{ts,tsx}", {
-  eager: true,
-  import: "default",
-  query: "?raw",
-});
 
 const registryMetaModules = import.meta.glob<RegistryMetaModule>(
   "../../../registry/base-nova/**/_meta.ts",
@@ -31,7 +25,6 @@ const registryMetaModules = import.meta.glob<RegistryMetaModule>(
   },
 );
 
-const registrySourceByPath = normalizeGlobFiles(registrySources);
 const metaByPath = normalizeGlobFiles(registryMetaModules);
 export const registryMetadataItems = Object.values(metaByPath).flatMap((module) =>
   module.registryItem ? [module.registryItem] : [],
@@ -39,13 +32,11 @@ export const registryMetadataItems = Object.values(metaByPath).flatMap((module) 
 
 export type RegistrySourceFile = RegistryFile & {
   fileName: string;
-  source: string;
 };
 
 export type RegistryPreviewSourceFile = {
   path: string;
   fileName: string;
-  source: string;
 };
 
 export type RegistryCatalogItem = RegistryItem & {
@@ -58,7 +49,6 @@ export const registryItems = registryIndex.items.map((item) => ({
   sourceFiles: item.files.map((file) => ({
     ...file,
     fileName: getFileName(file.path),
-    source: registrySourceByPath[file.path] ?? "",
   })),
   previewSourceFile: getPreviewSourceFile(item),
 })) satisfies RegistryCatalogItem[];
@@ -79,18 +69,6 @@ export function getRegistryJsonItems() {
   return registryIndex.items;
 }
 
-export function getMissingRegistrySourcePaths() {
-  return registryItems.flatMap((item) =>
-    item.sourceFiles.filter((file) => file.source.length === 0).map((file) => file.path),
-  );
-}
-
-export function getMissingRegistryPreviewPaths() {
-  return registryItems.flatMap((item) =>
-    item.previewSourceFile.source.length === 0 ? [item.previewSourceFile.path] : [],
-  );
-}
-
 function normalizeGlobFiles<T>(files: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(files).map(([path, source]) => [normalizeGlobPath(path), source]),
@@ -107,7 +85,6 @@ function getPreviewSourceFile(item: RegistryItem): RegistryPreviewSourceFile {
   return {
     path,
     fileName: getFileName(path),
-    source: registrySourceByPath[path] ?? "",
   };
 }
 

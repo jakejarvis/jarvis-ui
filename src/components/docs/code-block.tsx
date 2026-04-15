@@ -6,10 +6,11 @@ import { cn } from "@/lib/utils";
 
 type CodeBlockProps = {
   code: string;
+  highlightedCode?: React.ReactNode;
   className?: string;
 };
 
-export function CodeBlock({ code, className }: CodeBlockProps) {
+export function CodeBlock({ code, highlightedCode, className }: CodeBlockProps) {
   const [copied, setCopied] = React.useState(false);
 
   async function copyCode() {
@@ -35,9 +36,13 @@ export function CodeBlock({ code, className }: CodeBlockProps) {
         {copied ? <IconCheck /> : <IconCopy />}
         <span className="sr-only">Copy code</span>
       </Button>
-      <pre className="overflow-x-auto p-4 pr-12 text-sm leading-6">
-        <code>{code}</code>
-      </pre>
+      {highlightedCode ? (
+        <div className="overflow-x-auto py-3 pr-12 pl-6 text-sm leading-6">{highlightedCode}</div>
+      ) : (
+        <pre className="overflow-x-auto py-3 pr-12 pl-6 text-sm leading-6">
+          <code>{code}</code>
+        </pre>
+      )}
     </div>
   );
 }

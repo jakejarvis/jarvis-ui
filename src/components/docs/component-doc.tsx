@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { type RegistryCatalogItem } from "@/lib/registry/catalog";
+import type { RegistryItemDetail } from "@/lib/registry/detail.functions";
 
 import { CodeBlock } from "./code-block";
 import { ComponentPreview } from "./component-preview";
 import { InstallCommand } from "./install-command";
 
 type RegistryItemDocProps = {
-  item: RegistryCatalogItem;
+  item: RegistryItemDetail;
   section: "Components" | "Blocks";
   sectionPath: "/components" | "/blocks";
 };
@@ -59,7 +59,10 @@ export function RegistryItemDoc({ item, section, sectionPath }: RegistryItemDocP
         </TabsContent>
         <TabsContent value="code">
           {item.previewSourceFile.source ? (
-            <CodeBlock code={item.previewSourceFile.source} />
+            <CodeBlock
+              code={item.previewSourceFile.source}
+              highlightedCode={item.previewSourceFile.highlightedCode}
+            />
           ) : (
             <p className="text-sm text-muted-foreground">No preview source is available.</p>
           )}
@@ -85,7 +88,11 @@ export function RegistryItemDoc({ item, section, sectionPath }: RegistryItemDocP
           <TabsContent value="manual">
             <div className="flex flex-col gap-4">
               {item.sourceFiles.map((file) => (
-                <CodeBlock key={file.path} code={file.source} />
+                <CodeBlock
+                  key={file.path}
+                  code={file.source}
+                  highlightedCode={file.highlightedCode}
+                />
               ))}
             </div>
           </TabsContent>
