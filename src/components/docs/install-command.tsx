@@ -17,8 +17,8 @@ import { Yarn } from "@/components/ui/svgs/yarn";
 import { siteConfig, type RegistryCatalogItem } from "@/lib/registry/catalog";
 import { cn } from "@/lib/utils";
 
-const PACKAGE_MANAGER_STORAGE_KEY = "jarvis-ui-package-manager";
-const PACKAGE_MANAGER_CHANGE_EVENT = "jarvis-ui-package-manager-change";
+const PACKAGE_MANAGER_STORAGE_KEY = "preferred-pm";
+const PACKAGE_MANAGER_CHANGE_EVENT = "preferred-pm-change";
 const DEFAULT_PACKAGE_MANAGER = "npm";
 
 export const packageManagers = [
@@ -33,14 +33,14 @@ export const packageManagers = [
     logo: Pnpm,
   },
   {
-    value: "bun",
-    label: "bun",
-    logo: Bun,
-  },
-  {
     value: "yarn",
     label: "yarn",
     logo: Yarn,
+  },
+  {
+    value: "bun",
+    label: "bun",
+    logo: Bun,
   },
 ] as const;
 

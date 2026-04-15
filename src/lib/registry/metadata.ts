@@ -1,3 +1,11 @@
+export const registryConfig = {
+  $schema: "https://ui.shadcn.com/schema/registry.json",
+  name: "jarvis-ui",
+  homepage: "https://ui.jarv.is",
+} as const;
+
+export const registryItemSchema = "https://ui.shadcn.com/schema/registry-item.json";
+
 export type RegistryFileType =
   | "registry:component"
   | "registry:lib"

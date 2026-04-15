@@ -22,7 +22,7 @@ Use **Vite+**: `vp install`, `vp dev`, `vp build`, `vp test`
 
 ## Tooling
 - **Vite+** (`vp`): dev/build/test/lint/fmt — config in `vite.config.ts`
-- **Registry**: `vp run registry:generate` after changing `registry/` items; `vp run registry:build` for shadcn build / `public/r/`
+- **Registry**: `/r/*.json` is served by TanStack Start server routes from `registry/base-nova/**/_meta.ts` and raw source imports
 
 ## File-Scoped Commands
 | Task | Command |

@@ -43,8 +43,8 @@ export function RegistryItemDoc({ item, section, sectionPath }: RegistryItemDocP
         <p className="text-lg text-muted-foreground">{item.description}</p>
       </header>
 
-      <Tabs defaultValue="preview">
-        <TabsList>
+      <Tabs defaultValue="preview" className="gap-4">
+        <TabsList variant="line">
           <TabsTrigger value="preview">
             <IconAppWindow data-icon="inline-start" />
             Preview

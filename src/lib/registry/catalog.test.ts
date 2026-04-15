@@ -2,11 +2,15 @@ import { describe, expect, test } from "vitest";
 
 import {
   getRegistryItemsByType,
-  getRegistryJsonItems,
-  getRegistryJsonItemNames,
   registryMetadataItems,
   registryItems,
 } from "@/lib/registry/catalog";
+import {
+  getRegistryIndexJson,
+  getRegistryItemJson,
+  getRegistryValidationErrors,
+} from "@/lib/registry/json.server";
+import { registryItemSchema } from "@/lib/registry/metadata";
 import {
   getMissingRegistryPreviewPaths,
   getMissingRegistrySourcePaths,
@@ -31,8 +35,8 @@ describe("registry catalog", () => {
     expect(registryMetadataItems.map((item) => item.name)).toEqual(
       getAlphabetizedItemNames(registryMetadataItems),
     );
-    expect(getRegistryJsonItems().map((item) => item.name)).toEqual(
-      getAlphabetizedItemNames(getRegistryJsonItems()),
+    expect(getRegistryIndexJson().items.map((item) => item.name)).toEqual(
+      getAlphabetizedItemNames(getRegistryIndexJson().items),
     );
 
     for (const type of ["registry:block", "registry:component"] as const) {
@@ -44,19 +48,35 @@ describe("registry catalog", () => {
 
   test("matches the registry index", () => {
     const catalogNames = registryItems.map((item) => item.name).toSorted();
-    const registryNames = getRegistryJsonItemNames().toSorted();
+    const registryNames = getRegistryIndexJson()
+      .items.map((item) => item.name)
+      .toSorted();
 
     expect(catalogNames).toEqual(registryNames);
   });
 
-  test("registry index matches item metadata", () => {
-    const metadataByName = new Map(registryMetadataItems.map((item) => [item.name, item]));
+  test("builds the registry index from item metadata", () => {
+    expect(getRegistryIndexJson().items).toEqual(registryMetadataItems);
+  });
 
-    expect([...metadataByName.keys()].toSorted()).toEqual(getRegistryJsonItemNames().toSorted());
+  test("builds shadcn registry item JSON with file contents", () => {
+    for (const item of registryItems) {
+      const registryItemJson = getRegistryItemJson(item.name);
 
-    for (const item of getRegistryJsonItems()) {
-      expect(item).toEqual(metadataByName.get(item.name));
+      expect(registryItemJson).not.toBeNull();
+      expect(registryItemJson?.$schema).toBe(registryItemSchema);
+      expect(registryItemJson?.name).toBe(item.name);
+      expect(registryItemJson?.files.map(toRegistryFileDefinition)).toEqual(item.files);
+      expect(registryItemJson?.files.every((file) => file.content.length > 0)).toBe(true);
     }
+  });
+
+  test("returns null for unknown registry item JSON", () => {
+    expect(getRegistryItemJson("missing-item")).toBeNull();
+  });
+
+  test("validates published registry metadata and sources", () => {
+    expect(getRegistryValidationErrors()).toEqual([]);
   });
 
   test("has preview snippets for every item", () => {
@@ -110,4 +130,18 @@ function compareRegistryItemNames(
   return (
     registryItemCollator.compare(a.title, b.title) || registryItemCollator.compare(a.name, b.name)
   );
+}
+
+function toRegistryFileDefinition(file: {
+  path: string;
+  type: string;
+  target?: string;
+  content: string;
+}) {
+  return file.target
+    ? { path: file.path, type: file.type, target: file.target }
+    : {
+        path: file.path,
+        type: file.type,
+      };
 }

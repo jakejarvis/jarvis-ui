@@ -21,7 +21,7 @@ const config = defineConfig({
         "style",
         "unknown",
       ],
-      internalPattern: ["@/", "@/registry/"],
+      internalPattern: ["@/"],
       newlinesBetween: true,
       order: "asc",
     },
@@ -37,14 +37,7 @@ const config = defineConfig({
         },
       },
     ],
-    ignorePatterns: [
-      "src/routeTree.gen.ts",
-      "AGENTS.md",
-      "README.md",
-      ".cta.json",
-      "registry.json",
-      "public/r/**/*",
-    ],
+    ignorePatterns: ["src/routeTree.gen.ts", "AGENTS.md", "README.md", ".cta.json"],
   },
   lint: {
     plugins: ["oxc", "eslint", "typescript", "react", "import", "unicorn", "vitest", "jsx-a11y"],
@@ -68,14 +61,12 @@ const config = defineConfig({
           "typescript/no-unused-vars": "off",
         },
       },
-      {
-        files: ["scripts/**/*.ts"],
-        rules: {
-          "typescript/no-unsafe-type-assertion": "off",
-        },
-      },
     ],
-    ignorePatterns: ["src/routeTree.gen.ts", "registry.json", "public/r/**/*"],
+    ignorePatterns: ["src/routeTree.gen.ts"],
+  },
+  test: {
+    include: ["**/*.test.ts", "**/*.test.tsx"],
+    globals: true,
   },
   resolve: { tsconfigPaths: true },
   plugins: [
@@ -84,6 +75,7 @@ const config = defineConfig({
     tanstackStart({
       prerender: {
         enabled: true,
+        autoSubfolderIndex: false,
         crawlLinks: true,
         failOnError: true,
       },

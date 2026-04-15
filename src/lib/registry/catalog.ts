@@ -1,19 +1,22 @@
-import registryIndex from "../../../registry.json";
-import type { RegistryItemDefinition } from "./metadata";
+import {
+  registryConfig,
+  type RegistryFileDefinition,
+  type RegistryItemDefinition,
+} from "./metadata";
 
 export const siteConfig = {
   name: "@jarvis-ui",
-  registryName: registryIndex.name,
+  registryName: registryConfig.name,
   namespace: "@jarvis-ui",
-  homepage: registryIndex.homepage,
+  homepage: registryConfig.homepage,
   registryPath: "/r",
   displayBaseUrl: "https://ui.jarv.is",
   description:
     "An intentionally random collection of components and blocks, likely only useful to one person (me).",
 } as const;
 
-type RegistryItem = (typeof registryIndex.items)[number];
-export type RegistryFile = RegistryItem["files"][number];
+type RegistryItem = RegistryItemDefinition;
+export type RegistryFile = RegistryFileDefinition;
 export type RegistryType = RegistryItem["type"];
 type RegistryMetaModule = {
   registryItem?: RegistryItemDefinition;
@@ -50,7 +53,7 @@ export type RegistryCatalogItem = RegistryItem & {
   previewSourceFile: RegistryPreviewSourceFile;
 };
 
-export const registryItems = registryIndex.items.toSorted(compareRegistryItemNames).map((item) =>
+export const registryItems = registryMetadataItems.map((item) =>
   Object.assign({}, item, {
     sourceFiles: item.files.map((file) =>
       Object.assign({}, file, {
@@ -67,14 +70,6 @@ export function getRegistryItem(name: string) {
 
 export function getRegistryItemsByType(type: RegistryType) {
   return registryItems.filter((item) => item.type === type);
-}
-
-export function getRegistryJsonItemNames() {
-  return registryIndex.items.map((item) => item.name);
-}
-
-export function getRegistryJsonItems() {
-  return registryIndex.items;
 }
 
 function normalizeGlobFiles<T>(files: Record<string, T>) {

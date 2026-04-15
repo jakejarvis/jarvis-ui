@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsIndexRouteImport } from './routes/components.index'
 import { Route as BlocksIndexRouteImport } from './routes/blocks.index'
+import { Route as RChar123nameChar125DotjsonRouteImport } from './routes/r/{$name}[.]json'
+import { Route as RRegistryDotjsonRouteImport } from './routes/r/registry[.]json'
 import { Route as ComponentsNameRouteImport } from './routes/components.$name'
 import { Route as BlocksNameRouteImport } from './routes/blocks.$name'
 
@@ -30,6 +32,17 @@ const BlocksIndexRoute = BlocksIndexRouteImport.update({
   path: '/blocks/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RChar123nameChar125DotjsonRoute =
+  RChar123nameChar125DotjsonRouteImport.update({
+    id: '/r/{$name}.json',
+    path: '/r/{$name}.json',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const RRegistryDotjsonRoute = RRegistryDotjsonRouteImport.update({
+  id: '/r/registry.json',
+  path: '/r/registry.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsNameRoute = ComponentsNameRouteImport.update({
   id: '/components/$name',
   path: '/components/$name',
@@ -45,6 +58,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/blocks/$name': typeof BlocksNameRoute
   '/components/$name': typeof ComponentsNameRoute
+  '/r/registry.json': typeof RRegistryDotjsonRoute
+  '/r/{$name}.json': typeof RChar123nameChar125DotjsonRoute
   '/blocks/': typeof BlocksIndexRoute
   '/components/': typeof ComponentsIndexRoute
 }
@@ -52,6 +67,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blocks/$name': typeof BlocksNameRoute
   '/components/$name': typeof ComponentsNameRoute
+  '/r/registry.json': typeof RRegistryDotjsonRoute
+  '/r/{$name}.json': typeof RChar123nameChar125DotjsonRoute
   '/blocks': typeof BlocksIndexRoute
   '/components': typeof ComponentsIndexRoute
 }
@@ -60,6 +77,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/blocks/$name': typeof BlocksNameRoute
   '/components/$name': typeof ComponentsNameRoute
+  '/r/registry.json': typeof RRegistryDotjsonRoute
+  '/r/{$name}.json': typeof RChar123nameChar125DotjsonRoute
   '/blocks/': typeof BlocksIndexRoute
   '/components/': typeof ComponentsIndexRoute
 }
@@ -69,15 +88,26 @@ export interface FileRouteTypes {
     | '/'
     | '/blocks/$name'
     | '/components/$name'
+    | '/r/registry.json'
+    | '/r/{$name}.json'
     | '/blocks/'
     | '/components/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/blocks/$name' | '/components/$name' | '/blocks' | '/components'
+  to:
+    | '/'
+    | '/blocks/$name'
+    | '/components/$name'
+    | '/r/registry.json'
+    | '/r/{$name}.json'
+    | '/blocks'
+    | '/components'
   id:
     | '__root__'
     | '/'
     | '/blocks/$name'
     | '/components/$name'
+    | '/r/registry.json'
+    | '/r/{$name}.json'
     | '/blocks/'
     | '/components/'
   fileRoutesById: FileRoutesById
@@ -86,6 +116,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BlocksNameRoute: typeof BlocksNameRoute
   ComponentsNameRoute: typeof ComponentsNameRoute
+  RRegistryDotjsonRoute: typeof RRegistryDotjsonRoute
+  RChar123nameChar125DotjsonRoute: typeof RChar123nameChar125DotjsonRoute
   BlocksIndexRoute: typeof BlocksIndexRoute
   ComponentsIndexRoute: typeof ComponentsIndexRoute
 }
@@ -113,6 +145,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlocksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/r/{$name}.json': {
+      id: '/r/{$name}.json'
+      path: '/r/{$name}.json'
+      fullPath: '/r/{$name}.json'
+      preLoaderRoute: typeof RChar123nameChar125DotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/r/registry.json': {
+      id: '/r/registry.json'
+      path: '/r/registry.json'
+      fullPath: '/r/registry.json'
+      preLoaderRoute: typeof RRegistryDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/$name': {
       id: '/components/$name'
       path: '/components/$name'
@@ -134,6 +180,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BlocksNameRoute: BlocksNameRoute,
   ComponentsNameRoute: ComponentsNameRoute,
+  RRegistryDotjsonRoute: RRegistryDotjsonRoute,
+  RChar123nameChar125DotjsonRoute: RChar123nameChar125DotjsonRoute,
   BlocksIndexRoute: BlocksIndexRoute,
   ComponentsIndexRoute: ComponentsIndexRoute,
 }
