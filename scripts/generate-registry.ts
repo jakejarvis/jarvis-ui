@@ -1,4 +1,4 @@
-import { access, readdir, readFile, writeFile } from "node:fs/promises";
+import { access, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { cwd, exit } from "node:process";
 import { pathToFileURL } from "node:url";
@@ -13,6 +13,10 @@ const registryConfig = {
 
 const registryRoot = path.resolve("registry/base-nova");
 const registryJsonPath = path.resolve("registry.json");
+const registryItemCollator = new Intl.Collator("en", {
+  numeric: true,
+  sensitivity: "base",
+});
 
 type RegistryMetaModule = {
   registryItem?: RegistryItemDefinition;
@@ -33,10 +37,7 @@ async function main() {
   const records = await Promise.all(metaPaths.map(loadRegistryItemRecord));
   await validateRegistryItemRecords(records);
 
-  const order = await readExistingRegistryOrder();
-  const items = [...records]
-    .toSorted((a, b) => compareRegistryItemRecords(a, b, order))
-    .map((record) => record.item);
+  const items = [...records].toSorted(compareRegistryItemRecords).map((record) => record.item);
 
   await writeFile(
     registryJsonPath,
@@ -139,31 +140,12 @@ async function assertPathExists(filePath: string, metaPath: string) {
   }
 }
 
-async function readExistingRegistryOrder() {
-  try {
-    const source = await readFile(registryJsonPath, "utf8");
-    const registry = JSON.parse(source) as { items?: Array<{ name?: string }> };
-
-    return new Map(
-      (registry.items ?? []).flatMap((item, index) =>
-        item.name ? ([[item.name, index]] as const) : [],
-      ),
-    );
-  } catch {
-    return new Map<string, number>();
-  }
-}
-
-function compareRegistryItemRecords(
-  a: RegistryItemRecord,
-  b: RegistryItemRecord,
-  order: Map<string, number>,
-) {
-  const unorderedIndex = Number.MAX_SAFE_INTEGER;
-  const aIndex = order.get(a.item.name) ?? unorderedIndex;
-  const bIndex = order.get(b.item.name) ?? unorderedIndex;
-
-  return aIndex - bIndex || a.metaPath.localeCompare(b.metaPath);
+function compareRegistryItemRecords(a: RegistryItemRecord, b: RegistryItemRecord) {
+  return (
+    registryItemCollator.compare(a.item.title, b.item.title) ||
+    registryItemCollator.compare(a.item.name, b.item.name) ||
+    registryItemCollator.compare(a.metaPath, b.metaPath)
+  );
 }
 
 function toRelativePath(filePath: string) {

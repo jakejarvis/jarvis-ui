@@ -27,9 +27,14 @@ const registryMetaModules = import.meta.glob<RegistryMetaModule>(
 );
 
 const metaByPath = normalizeGlobFiles(registryMetaModules);
-export const registryMetadataItems = Object.values(metaByPath).flatMap((module) =>
-  module.registryItem ? [module.registryItem] : [],
-);
+const registryItemCollator = new Intl.Collator("en", {
+  numeric: true,
+  sensitivity: "base",
+});
+
+export const registryMetadataItems = Object.values(metaByPath)
+  .flatMap((module) => (module.registryItem ? [module.registryItem] : []))
+  .toSorted(compareRegistryItemNames);
 
 export type RegistrySourceFile = RegistryFile & {
   fileName: string;
@@ -45,14 +50,16 @@ export type RegistryCatalogItem = RegistryItem & {
   previewSourceFile: RegistryPreviewSourceFile;
 };
 
-export const registryItems = registryIndex.items.map((item) => ({
-  ...item,
-  sourceFiles: item.files.map((file) => ({
-    ...file,
-    fileName: getFileName(file.path),
-  })),
-  previewSourceFile: getPreviewSourceFile(item),
-})) satisfies RegistryCatalogItem[];
+export const registryItems = registryIndex.items.toSorted(compareRegistryItemNames).map((item) =>
+  Object.assign({}, item, {
+    sourceFiles: item.files.map((file) =>
+      Object.assign({}, file, {
+        fileName: getFileName(file.path),
+      }),
+    ),
+    previewSourceFile: getPreviewSourceFile(item),
+  }),
+) satisfies RegistryCatalogItem[];
 
 export function getRegistryItem(name: string) {
   return registryItems.find((item) => item.name === name);
@@ -78,6 +85,15 @@ function normalizeGlobFiles<T>(files: Record<string, T>) {
 
 function normalizeGlobPath(path: string) {
   return path.replace(/^(\.\.\/){3}/, "");
+}
+
+function compareRegistryItemNames(
+  a: Pick<RegistryItemDefinition, "name" | "title">,
+  b: Pick<RegistryItemDefinition, "name" | "title">,
+) {
+  return (
+    registryItemCollator.compare(a.title, b.title) || registryItemCollator.compare(a.name, b.name)
+  );
 }
 
 function getPreviewSourceFile(item: RegistryItem): RegistryPreviewSourceFile {

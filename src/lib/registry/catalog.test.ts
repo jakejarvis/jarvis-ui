@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  getRegistryItemsByType,
   getRegistryJsonItems,
   getRegistryJsonItemNames,
   registryMetadataItems,
@@ -13,11 +14,32 @@ import {
   trimBlankTrailingLines,
 } from "@/lib/registry/source.server";
 
+const registryItemCollator = new Intl.Collator("en", {
+  numeric: true,
+  sensitivity: "base",
+});
+
 describe("registry catalog", () => {
   test("has unique item names", () => {
     const names = registryItems.map((item) => item.name);
 
     expect(new Set(names).size).toBe(names.length);
+  });
+
+  test("orders registry item lists alphabetically", () => {
+    expect(registryItems.map((item) => item.name)).toEqual(getAlphabetizedItemNames(registryItems));
+    expect(registryMetadataItems.map((item) => item.name)).toEqual(
+      getAlphabetizedItemNames(registryMetadataItems),
+    );
+    expect(getRegistryJsonItems().map((item) => item.name)).toEqual(
+      getAlphabetizedItemNames(getRegistryJsonItems()),
+    );
+
+    for (const type of ["registry:block", "registry:component"] as const) {
+      const items = getRegistryItemsByType(type);
+
+      expect(items.map((item) => item.name)).toEqual(getAlphabetizedItemNames(items));
+    }
   });
 
   test("matches the registry index", () => {
@@ -76,3 +98,16 @@ describe("registry catalog", () => {
     }
   });
 });
+
+function getAlphabetizedItemNames(items: Array<{ name: string; title: string }>) {
+  return items.toSorted(compareRegistryItemNames).map((item) => item.name);
+}
+
+function compareRegistryItemNames(
+  a: { name: string; title: string },
+  b: { name: string; title: string },
+) {
+  return (
+    registryItemCollator.compare(a.title, b.title) || registryItemCollator.compare(a.name, b.name)
+  );
+}
