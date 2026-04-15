@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "copyable-field",
+  "title": "Copyable Field",
+  "description": "A selectable, horizontally scrollable field with a copy action.",
+  "registryDependencies": [
+    "copy-button",
+    "field",
+    "input-group",
+    "scroll-area"
+  ],
+  "files": [
+    {
+      "path": "registry/base-nova/copyable-field/copyable-field.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { CopyButton } from \"@/components/ui/copy-button\";\nimport { Field, FieldLabel } from \"@/components/ui/field\";\nimport { InputGroup, InputGroupAddon } from \"@/components/ui/input-group\";\nimport { ScrollArea } from \"@/components/ui/scroll-area\";\nimport { cn } from \"@/lib/utils\";\n\ntype CopyableFieldCopyEvent = Parameters<\n  NonNullable<React.ComponentProps<typeof CopyButton>[\"onCopied\"]>\n>[1];\n\ntype CopyableFieldProps = Omit<React.ComponentProps<typeof Field>, \"children\" | \"onCopy\"> & {\n  label: React.ReactNode;\n  value: string;\n  copyValue?: string;\n  showLabel?: boolean;\n  copyLabel?: string;\n  copiedLabel?: string;\n  resetDelay?: number;\n  children?: React.ReactNode;\n  onCopy?: (value: string, event: CopyableFieldCopyEvent) => void;\n  onCopyError?: (error: unknown, event: CopyableFieldCopyEvent) => void;\n};\n\nfunction CopyableField({\n  label,\n  value,\n  copyValue = value,\n  showLabel = true,\n  copyLabel = \"Copy to clipboard\",\n  copiedLabel = \"Copied\",\n  resetDelay = 2000,\n  children,\n  className,\n  onCopy,\n  onCopyError,\n  ...props\n}: CopyableFieldProps) {\n  const contentRef = React.useRef<HTMLSpanElement>(null);\n\n  const handleSelect = React.useCallback(() => {\n    if (!contentRef.current) {\n      return;\n    }\n\n    const selection = window.getSelection();\n\n    if (!selection) {\n      return;\n    }\n\n    const range = document.createRange();\n\n    range.selectNodeContents(contentRef.current);\n    selection.removeAllRanges();\n    selection.addRange(range);\n  }, []);\n\n  return (\n    <Field className={cn(\"min-w-0\", className)} {...props}>\n      <FieldLabel className={cn(showLabel ? \"text-xs text-muted-foreground uppercase\" : \"sr-only\")}>\n        {label}\n      </FieldLabel>\n      <InputGroup className=\"h-10 min-w-0\">\n        <ScrollArea className=\"h-full min-w-0 flex-1 [&_[data-slot=scroll-area-scrollbar]]:hidden\">\n          <button\n            type=\"button\"\n            aria-label={typeof label === \"string\" ? `Select ${label}` : \"Select text\"}\n            onClick={handleSelect}\n            className=\"h-full w-full min-w-0 cursor-text bg-transparent py-0 pr-2 pl-3 text-left font-mono text-[13px] outline-none\"\n          >\n            <span ref={contentRef} className=\"inline-block whitespace-nowrap\">\n              {children ?? value}\n            </span>\n          </button>\n        </ScrollArea>\n        <InputGroupAddon align=\"inline-end\">\n          <CopyButton\n            value={copyValue}\n            size=\"icon-xs\"\n            copyLabel={copyLabel}\n            copiedLabel={copiedLabel}\n            resetDelay={resetDelay}\n            onCopied={onCopy}\n            onCopyError={onCopyError}\n          />\n        </InputGroupAddon>\n      </InputGroup>\n    </Field>\n  );\n}\n\nexport { CopyableField, type CopyableFieldProps };\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

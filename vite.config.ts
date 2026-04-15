@@ -82,6 +82,11 @@ const config = defineConfig({
     devtools(),
     tailwindcss(),
     tanstackStart({
+      prerender: {
+        enabled: true,
+        crawlLinks: true,
+        failOnError: true,
+      },
       rsc: {
         enabled: true,
       },

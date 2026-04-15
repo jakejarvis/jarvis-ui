@@ -31,6 +31,42 @@
       ]
     },
     {
+      "name": "copy-button",
+      "type": "registry:component",
+      "title": "Copy Button",
+      "description": "A button that copies text to the clipboard with built-in success feedback.",
+      "dependencies": [
+        "@tabler/icons-react"
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/copy-button/copy-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "copyable-field",
+      "type": "registry:component",
+      "title": "Copyable Field",
+      "description": "A selectable, horizontally scrollable field with a copy action.",
+      "registryDependencies": [
+        "copy-button",
+        "field",
+        "input-group",
+        "scroll-area"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/copyable-field/copyable-field.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "scroll-area",
       "type": "registry:component",
       "title": "Scroll Area",

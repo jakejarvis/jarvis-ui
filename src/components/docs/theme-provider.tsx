@@ -1,6 +1,6 @@
 import * as React from "react";
 
-const THEME_STORAGE_KEY = "jarvis-ui-theme";
+const THEME_STORAGE_KEY = "theme";
 
 type Theme = "light" | "dark" | "system";
 
@@ -44,19 +44,7 @@ function applyTheme(theme: Theme) {
   return resolvedTheme;
 }
 
-export const themeScript = `
-(() => {
-  try {
-    const key = "${THEME_STORAGE_KEY}";
-    const stored = window.localStorage.getItem(key);
-    const theme = stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
-    const system = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const resolved = theme === "system" ? system : theme;
-    document.documentElement.classList.toggle("dark", resolved === "dark");
-    document.documentElement.dataset.theme = theme;
-  } catch {}
-})();
-`;
+export const themeScript = `(()=>{try{const e="${THEME_STORAGE_KEY}",t=window.localStorage.getItem(e),a="light"===t||"dark"===t||"system"===t?t:"system",m=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light",s="system"===a?m:a;document.documentElement.classList.toggle("dark","dark"===s),document.documentElement.dataset.theme=a}catch{}})();`;
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = React.useState<Theme>(getStoredTheme);
