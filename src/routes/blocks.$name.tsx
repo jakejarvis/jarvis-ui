@@ -15,7 +15,7 @@ function BlockRoute() {
   return (
     <DocsLayout section="blocks">
       {!item || item.type !== "registry:block" ? (
-        <RegistryItemNotFound name={name} />
+        <RegistryItemNotFound />
       ) : (
         <RegistryItemDoc item={item} section="Blocks" sectionPath="/blocks" />
       )}

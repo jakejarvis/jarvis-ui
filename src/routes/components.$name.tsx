@@ -15,7 +15,7 @@ function ComponentRoute() {
   return (
     <DocsLayout section="components">
       {!item || item.type !== "registry:component" ? (
-        <RegistryItemNotFound name={name} />
+        <RegistryItemNotFound />
       ) : (
         <RegistryItemDoc item={item} section="Components" sectionPath="/components" />
       )}

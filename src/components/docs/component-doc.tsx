@@ -1,3 +1,4 @@
+import { IconAppWindow, IconCode, IconFiles, IconTerminal } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 
 import {
@@ -44,8 +45,14 @@ export function RegistryItemDoc({ item, section, sectionPath }: RegistryItemDocP
 
       <Tabs defaultValue="preview">
         <TabsList>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="code">Code</TabsTrigger>
+          <TabsTrigger value="preview">
+            <IconAppWindow data-icon="inline-start" />
+            Preview
+          </TabsTrigger>
+          <TabsTrigger value="code">
+            <IconCode data-icon="inline-start" />
+            Code
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="preview">
           <ComponentPreview name={item.name} />
@@ -63,8 +70,14 @@ export function RegistryItemDoc({ item, section, sectionPath }: RegistryItemDocP
         <h2 className="font-heading text-xl font-semibold tracking-tight">Installation</h2>
         <Tabs defaultValue="cli">
           <TabsList>
-            <TabsTrigger value="cli">CLI</TabsTrigger>
-            <TabsTrigger value="manual">Manual</TabsTrigger>
+            <TabsTrigger value="cli">
+              <IconTerminal data-icon="inline-start" />
+              CLI
+            </TabsTrigger>
+            <TabsTrigger value="manual">
+              <IconFiles data-icon="inline-start" />
+              Manual
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="cli">
             <InstallCommand item={item} />
@@ -82,16 +95,13 @@ export function RegistryItemDoc({ item, section, sectionPath }: RegistryItemDocP
   );
 }
 
-export function RegistryItemNotFound({ name }: { name: string }) {
+export function RegistryItemNotFound() {
   return (
-    <div className="flex min-h-96 flex-col items-start justify-center gap-4">
+    <div className="mt-4 flex flex-col items-start justify-center gap-4">
       <div className="flex max-w-xl flex-col gap-2">
-        <h1 className="font-heading text-3xl font-semibold">No registry item named {name}</h1>
-        <p className="text-muted-foreground">
-          Check the registry overview for the items currently published by this site.
-        </p>
+        <h1 className="font-heading text-lg font-semibold">Component not found</h1>
       </div>
-      <Button variant="outline" render={<Link to="/" />}>
+      <Button variant="outline" nativeButton={false} render={<Link to="/" />}>
         Back to overview
       </Button>
     </div>

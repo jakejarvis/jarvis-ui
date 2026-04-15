@@ -1,4 +1,4 @@
-import { IconBrandGithub } from "@tabler/icons-react";
+import { IconBlocks, IconBrandGithub } from "@tabler/icons-react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,8 @@ function HomePage() {
         <p className="max-w-lg text-lg text-muted-foreground">{siteConfig.description}</p>
         <div className="flex items-center gap-3">
           <Button size="lg" nativeButton={false} render={<Link to="/components" />}>
-            Browse Components
+            <IconBlocks data-icon="inline-start" />
+            Browse
           </Button>
           <Button
             variant="outline"

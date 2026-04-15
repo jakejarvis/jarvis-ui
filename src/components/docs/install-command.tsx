@@ -1,7 +1,6 @@
 import { IconCheck, IconChevronDown, IconCopy } from "@tabler/icons-react";
 import * as React from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -120,62 +119,47 @@ export function InstallCommand({ item, className }: InstallCommandProps) {
   }
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
-      <div className="min-w-0 overflow-hidden rounded-lg border bg-muted/40">
-        <div className="flex min-h-10 items-center justify-between gap-2 border-b px-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
-              <SelectedLogo data-icon="inline-start" aria-hidden="true" />
-              {selectedPackageManager.label}
-              <IconChevronDown data-icon="inline-end" aria-hidden="true" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-40">
-              <DropdownMenuGroup>
-                <DropdownMenuRadioGroup
-                  value={packageManager}
-                  onValueChange={(value) => {
-                    if (isPackageManager(value)) {
-                      setPackageManager(value);
-                    }
-                  }}
-                >
-                  {packageManagers.map((option) => {
-                    const Logo = option.logo;
+    <div className={cn("min-w-0 overflow-hidden rounded-lg border bg-muted/40", className)}>
+      <div className="flex min-h-10 items-center justify-between gap-2 border-b px-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
+            <SelectedLogo data-icon="inline-start" aria-hidden="true" />
+            {selectedPackageManager.label}
+            <IconChevronDown data-icon="inline-end" aria-hidden="true" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="min-w-40">
+            <DropdownMenuGroup>
+              <DropdownMenuRadioGroup
+                value={packageManager}
+                onValueChange={(value) => {
+                  if (isPackageManager(value)) {
+                    setPackageManager(value);
+                  }
+                }}
+              >
+                {packageManagers.map((option) => {
+                  const Logo = option.logo;
 
-                    return (
-                      <DropdownMenuRadioItem key={option.value} value={option.value}>
-                        <Logo data-icon="inline-start" aria-hidden="true" />
-                        {option.label}
-                      </DropdownMenuRadioItem>
-                    );
-                  })}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  return (
+                    <DropdownMenuRadioItem key={option.value} value={option.value}>
+                      <Logo data-icon="inline-start" aria-hidden="true" />
+                      {option.label}
+                    </DropdownMenuRadioItem>
+                  );
+                })}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-          <Button variant="ghost" size="icon-sm" onClick={() => void copyCommand()}>
-            {copied ? <IconCheck /> : <IconCopy />}
-            <span className="sr-only">Copy install command</span>
-          </Button>
-        </div>
-        <pre className="overflow-x-auto p-4 text-sm leading-6">
-          <code>{command}</code>
-        </pre>
+        <Button variant="ghost" size="icon-sm" onClick={() => void copyCommand()}>
+          {copied ? <IconCheck /> : <IconCopy />}
+          <span className="sr-only">Copy install command</span>
+        </Button>
       </div>
-
-      {item.registryDependencies?.length ? (
-        <div className="flex flex-col gap-2">
-          <span className="text-xs font-medium text-muted-foreground">Registry dependencies</span>
-          <div className="flex flex-wrap gap-2">
-            {item.registryDependencies.map((dependency) => (
-              <Badge key={dependency} variant="secondary">
-                {dependency}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      <pre className="overflow-x-auto p-4 text-sm leading-6">
+        <code>{command}</code>
+      </pre>
     </div>
   );
 }
