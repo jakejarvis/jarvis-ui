@@ -15,12 +15,13 @@ function HomePage() {
         </h1>
         <p className="max-w-lg text-lg text-muted-foreground">{siteConfig.description}</p>
         <div className="flex items-center gap-3">
-          <Button size="lg" render={<Link to="/components" />}>
+          <Button size="lg" nativeButton={false} render={<Link to="/components" />}>
             Browse Components
           </Button>
           <Button
             variant="outline"
             size="lg"
+            nativeButton={false}
             render={
               <a
                 href="https://github.com/jakejarvis/jarvis-ui"

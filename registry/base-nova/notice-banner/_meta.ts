@@ -13,16 +13,3 @@ export const registryItem = {
     },
   ],
 } satisfies RegistryItemDefinition;
-
-export const usage = `import { NoticeBanner } from "@/components/notice-banner"
-
-export function ReleaseNotice() {
-  return (
-    <NoticeBanner
-      eyebrow="Beta"
-      title="New reporting blocks are ready."
-      description="Install the registry item and adapt the copy to your product."
-      actionLabel="Read docs"
-    />
-  )
-}`;

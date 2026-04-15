@@ -16,7 +16,6 @@ type RegistryFile = RegistryItem["files"][number];
 type RegistryType = RegistryItem["type"];
 type RegistryMetaModule = {
   registryItem?: RegistryItemDefinition;
-  usage?: string;
 };
 
 const registrySources = import.meta.glob<string>("../../../registry/**/*.{ts,tsx}", {
@@ -43,9 +42,15 @@ export type RegistrySourceFile = RegistryFile & {
   source: string;
 };
 
+export type RegistryPreviewSourceFile = {
+  path: string;
+  fileName: string;
+  source: string;
+};
+
 export type RegistryCatalogItem = RegistryItem & {
   sourceFiles: RegistrySourceFile[];
-  usage: string;
+  previewSourceFile: RegistryPreviewSourceFile;
 };
 
 export const registryItems = registryIndex.items.map((item) => ({
@@ -55,7 +60,7 @@ export const registryItems = registryIndex.items.map((item) => ({
     fileName: getFileName(file.path),
     source: registrySourceByPath[file.path] ?? "",
   })),
-  usage: metaByPath[getMetaPath(item)]?.usage ?? "",
+  previewSourceFile: getPreviewSourceFile(item),
 })) satisfies RegistryCatalogItem[];
 
 export function getRegistryItem(name: string) {
@@ -80,8 +85,10 @@ export function getMissingRegistrySourcePaths() {
   );
 }
 
-export function getRegistryItemsMissingUsage() {
-  return registryItems.filter((item) => item.usage.length === 0).map((item) => item.name);
+export function getMissingRegistryPreviewPaths() {
+  return registryItems.flatMap((item) =>
+    item.previewSourceFile.source.length === 0 ? [item.previewSourceFile.path] : [],
+  );
 }
 
 function normalizeGlobFiles<T>(files: Record<string, T>) {
@@ -94,8 +101,14 @@ function normalizeGlobPath(path: string) {
   return path.replace(/^(\.\.\/){3}/, "");
 }
 
-function getMetaPath(item: RegistryItem) {
-  return `${getRegistryItemRoot(item)}/_meta.ts`;
+function getPreviewSourceFile(item: RegistryItem): RegistryPreviewSourceFile {
+  const path = `${getRegistryItemRoot(item)}/_preview.tsx`;
+
+  return {
+    path,
+    fileName: getFileName(path),
+    source: registrySourceByPath[path] ?? "",
+  };
 }
 
 function getRegistryItemRoot(item: RegistryItem) {

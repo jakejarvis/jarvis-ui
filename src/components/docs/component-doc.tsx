@@ -50,35 +50,34 @@ export function RegistryItemDoc({ item, section, sectionPath }: RegistryItemDocP
         <TabsContent value="preview">
           <ComponentPreview name={item.name} />
         </TabsContent>
-        <TabsContent value="code" className="flex flex-col gap-4">
-          {item.sourceFiles.map((file) => (
-            <CodeBlock key={file.path} code={file.source} label={file.path} />
-          ))}
+        <TabsContent value="code">
+          {item.previewSourceFile.source ? (
+            <CodeBlock code={item.previewSourceFile.source} />
+          ) : (
+            <p className="text-sm text-muted-foreground">No preview source is available.</p>
+          )}
         </TabsContent>
       </Tabs>
 
       <section className="flex flex-col gap-4">
         <h2 className="font-heading text-xl font-semibold tracking-tight">Installation</h2>
-        <InstallCommand item={item} />
+        <Tabs defaultValue="cli">
+          <TabsList>
+            <TabsTrigger value="cli">CLI</TabsTrigger>
+            <TabsTrigger value="manual">Manual</TabsTrigger>
+          </TabsList>
+          <TabsContent value="cli">
+            <InstallCommand item={item} />
+          </TabsContent>
+          <TabsContent value="manual">
+            <div className="flex flex-col gap-4">
+              {item.sourceFiles.map((file) => (
+                <CodeBlock key={file.path} code={file.source} />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </section>
-
-      {item.usage && (
-        <section className="flex flex-col gap-4">
-          <h2 className="font-heading text-xl font-semibold tracking-tight">Usage</h2>
-          <CodeBlock code={item.usage} label="Example" />
-        </section>
-      )}
-
-      {item.sourceFiles.length > 0 && (
-        <section className="flex flex-col gap-4">
-          <h2 className="font-heading text-xl font-semibold tracking-tight">Source</h2>
-          <div className="flex flex-col gap-4">
-            {item.sourceFiles.map((file) => (
-              <CodeBlock key={file.path} code={file.source} label={file.fileName} />
-            ))}
-          </div>
-        </section>
-      )}
     </article>
   );
 }

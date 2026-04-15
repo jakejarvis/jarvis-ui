@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  getMissingRegistryPreviewPaths,
   getMissingRegistrySourcePaths,
-  getRegistryItemsMissingUsage,
   getRegistryJsonItems,
   getRegistryJsonItemNames,
   registryMetadataItems,
@@ -33,9 +33,9 @@ describe("registry catalog", () => {
     }
   });
 
-  test("has usage snippets for every item", () => {
+  test("has preview snippets for every item", () => {
     for (const item of registryItems) {
-      expect(item.usage).toContain(`import`);
+      expect(item.previewSourceFile.source).toContain(`export function Preview`);
     }
   });
 
@@ -43,8 +43,8 @@ describe("registry catalog", () => {
     expect(getMissingRegistrySourcePaths()).toEqual([]);
   });
 
-  test("has usage docs for every item", () => {
-    expect(getRegistryItemsMissingUsage()).toEqual([]);
+  test("loads preview source for every item", () => {
+    expect(getMissingRegistryPreviewPaths()).toEqual([]);
   });
 
   test("publishes blocks as multi-file registry items", () => {

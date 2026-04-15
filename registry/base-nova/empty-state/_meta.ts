@@ -13,15 +13,3 @@ export const registryItem = {
     },
   ],
 } satisfies RegistryItemDefinition;
-
-export const usage = `import { EmptyState } from "@/components/empty-state"
-
-export function ComponentsTable() {
-  return (
-    <EmptyState
-      title="No results"
-      description="Try another filter or add a component to the registry."
-      actionLabel="Add item"
-    />
-  )
-}`;

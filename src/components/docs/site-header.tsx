@@ -59,6 +59,7 @@ export function SiteHeader() {
           <Button
             variant="ghost"
             size="icon"
+            nativeButton={false}
             render={
               <a
                 href="https://github.com/jakejarvis/jarvis-ui"
