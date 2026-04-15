@@ -4,6 +4,18 @@
   "homepage": "https://ui.jarv.is",
   "items": [
     {
+      "name": "browser-window",
+      "type": "registry:component",
+      "title": "Browser Window",
+      "description": "A compact browser chrome frame for screenshots and previews.",
+      "files": [
+        {
+          "path": "registry/base-nova/browser-window/browser-window.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "scroll-area",
       "type": "registry:component",
       "title": "Scroll Area",
