@@ -21,12 +21,12 @@ afterEach(() => {
 
 describe("install command", () => {
   test.each([
-    ["npm", "npx shadcn@latest add https://ui.jarv.is/r/metric-card.json"],
-    ["pnpm", "pnpm dlx shadcn@latest add https://ui.jarv.is/r/metric-card.json"],
-    ["bun", "bunx --bun shadcn@latest add https://ui.jarv.is/r/metric-card.json"],
-    ["yarn", "yarn dlx shadcn@latest add https://ui.jarv.is/r/metric-card.json"],
+    ["npm", "npx shadcn@latest add https://ui.jarv.is/r/tipover.json"],
+    ["pnpm", "pnpm dlx shadcn@latest add https://ui.jarv.is/r/tipover.json"],
+    ["bun", "bunx --bun shadcn@latest add https://ui.jarv.is/r/tipover.json"],
+    ["yarn", "yarn dlx shadcn@latest add https://ui.jarv.is/r/tipover.json"],
   ] satisfies [PackageManager, string][])("generates the %s command", (packageManager, command) => {
-    expect(getInstallCommand("metric-card", packageManager)).toBe(command);
+    expect(getInstallCommand("tipover", packageManager)).toBe(command);
   });
 
   test("defaults to npm before a preference is saved", () => {
@@ -90,10 +90,10 @@ describe("install command", () => {
 });
 
 function getTestItem() {
-  const item = registryItems.find((registryItem) => registryItem.name === "metric-card");
+  const item = registryItems.find((registryItem) => registryItem.name === "tipover");
 
   if (!item) {
-    throw new Error("Missing metric-card registry item");
+    throw new Error("Missing tipover registry item");
   }
 
   return item;
