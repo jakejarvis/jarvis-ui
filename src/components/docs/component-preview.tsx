@@ -4,7 +4,7 @@ type PreviewModule = {
   Preview?: React.ComponentType;
 };
 
-const previewModules = import.meta.glob("../../../registry/base-nova/**/docs.tsx", {
+const previewModules = import.meta.glob("../../../registry/base-nova/**/_preview.tsx", {
   eager: true,
 }) as Record<string, PreviewModule>;
 
@@ -36,11 +36,11 @@ export function ComponentPreview({ name }: ComponentPreviewProps) {
 
 function getRegistryItemName(path: string) {
   const segments = path.split("/");
-  const docsIndex = segments.indexOf("docs.tsx");
+  const previewIndex = segments.indexOf("_preview.tsx");
 
-  if (docsIndex <= 0) {
+  if (previewIndex <= 0) {
     return null;
   }
 
-  return segments[docsIndex - 1];
+  return segments[previewIndex - 1];
 }

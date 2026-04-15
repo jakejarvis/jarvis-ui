@@ -8,7 +8,10 @@
       "type": "registry:component",
       "title": "Metric Card",
       "description": "A compact metric card with a trend badge and supporting copy.",
-      "registryDependencies": ["card", "badge"],
+      "registryDependencies": [
+        "card",
+        "badge"
+      ],
       "files": [
         {
           "path": "registry/base-nova/metric-card/metric-card.tsx",
@@ -21,7 +24,10 @@
       "type": "registry:component",
       "title": "Notice Banner",
       "description": "A responsive announcement banner with a badge, message, and action.",
-      "registryDependencies": ["badge", "button"],
+      "registryDependencies": [
+        "badge",
+        "button"
+      ],
       "files": [
         {
           "path": "registry/base-nova/notice-banner/notice-banner.tsx",
@@ -34,7 +40,9 @@
       "type": "registry:component",
       "title": "Empty State",
       "description": "A centered empty state for dashboards, tables, and registry sections.",
-      "registryDependencies": ["button"],
+      "registryDependencies": [
+        "button"
+      ],
       "files": [
         {
           "path": "registry/base-nova/empty-state/empty-state.tsx",
@@ -47,7 +55,12 @@
       "type": "registry:block",
       "title": "Status Board",
       "description": "A reusable operations block with summary counts and prioritized status rows.",
-      "registryDependencies": ["badge", "button", "card", "separator"],
+      "registryDependencies": [
+        "badge",
+        "button",
+        "card",
+        "separator"
+      ],
       "files": [
         {
           "path": "registry/base-nova/blocks/status-board/components/status-board.tsx",

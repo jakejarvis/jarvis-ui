@@ -3,7 +3,9 @@ import { describe, expect, test } from "vitest";
 import {
   getMissingRegistrySourcePaths,
   getRegistryItemsMissingUsage,
+  getRegistryJsonItems,
   getRegistryJsonItemNames,
+  registryMetadataItems,
   registryItems,
 } from "@/lib/registry/catalog";
 
@@ -19,6 +21,16 @@ describe("registry catalog", () => {
     const registryNames = getRegistryJsonItemNames().sort();
 
     expect(catalogNames).toEqual(registryNames);
+  });
+
+  test("registry index matches item metadata", () => {
+    const metadataByName = new Map(registryMetadataItems.map((item) => [item.name, item]));
+
+    expect([...metadataByName.keys()].sort()).toEqual(getRegistryJsonItemNames().sort());
+
+    for (const item of getRegistryJsonItems()) {
+      expect(item).toEqual(metadataByName.get(item.name));
+    }
   });
 
   test("has install commands and snippets for every item", () => {

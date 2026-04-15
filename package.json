@@ -7,7 +7,8 @@
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test run",
-    "registry:build": "shadcn build && cp public/r/registry.json public/registry.json",
+    "registry:generate": "bun scripts/generate-registry.ts",
+    "registry:build": "vp exec shadcn build",
     "prepare": "vp config"
   },
   "dependencies": {

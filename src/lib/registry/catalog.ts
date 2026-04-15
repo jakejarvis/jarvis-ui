@@ -1,4 +1,5 @@
 import registryIndex from "../../../registry.json";
+import type { RegistryItemDefinition } from "./metadata";
 
 export const siteConfig = {
   name: "Jarvis UI",
@@ -13,7 +14,8 @@ export const siteConfig = {
 type RegistryItem = (typeof registryIndex.items)[number];
 type RegistryFile = RegistryItem["files"][number];
 type RegistryType = RegistryItem["type"];
-type RegistryDocsModule = {
+type RegistryMetaModule = {
+  registryItem?: RegistryItemDefinition;
   usage?: string;
 };
 
@@ -23,12 +25,15 @@ const registrySources = import.meta.glob("../../../registry/**/*.{ts,tsx}", {
   query: "?raw",
 }) as Record<string, string>;
 
-const registryDocsModules = import.meta.glob("../../../registry/base-nova/**/docs.tsx", {
+const registryMetaModules = import.meta.glob("../../../registry/base-nova/**/_meta.ts", {
   eager: true,
-}) as Record<string, RegistryDocsModule>;
+}) as Record<string, RegistryMetaModule>;
 
 const registrySourceByPath = normalizeGlobFiles(registrySources);
-const docsByPath = normalizeGlobFiles(registryDocsModules);
+const metaByPath = normalizeGlobFiles(registryMetaModules);
+export const registryMetadataItems = Object.values(metaByPath).flatMap((module) =>
+  module.registryItem ? [module.registryItem] : [],
+);
 
 export type RegistrySourceFile = RegistryFile & {
   fileName: string;
@@ -49,7 +54,7 @@ export const registryItems = registryIndex.items.map((item) => ({
     fileName: getFileName(file.path),
     source: registrySourceByPath[file.path] ?? "",
   })),
-  usage: docsByPath[getDocsPath(item)]?.usage ?? "",
+  usage: metaByPath[getMetaPath(item)]?.usage ?? "",
   installCommand: `bunx --bun shadcn@latest add ${siteConfig.displayBaseUrl}${siteConfig.registryPath}/${item.name}.json`,
   namespaceCommand: `bunx --bun shadcn@latest add ${siteConfig.namespace}/${item.name}`,
 })) satisfies RegistryCatalogItem[];
@@ -66,6 +71,10 @@ export function getRegistryJsonItemNames() {
   return registryIndex.items.map((item) => item.name);
 }
 
+export function getRegistryJsonItems() {
+  return registryIndex.items;
+}
+
 export function getMissingRegistrySourcePaths() {
   return registryItems.flatMap((item) =>
     item.sourceFiles.filter((file) => file.source.length === 0).map((file) => file.path),
@@ -74,18 +83,6 @@ export function getMissingRegistrySourcePaths() {
 
 export function getRegistryItemsMissingUsage() {
   return registryItems.filter((item) => item.usage.length === 0).map((item) => item.name);
-}
-
-export function getNamespaceConfigSnippet() {
-  return JSON.stringify(
-    {
-      registries: {
-        [siteConfig.namespace]: `${siteConfig.displayBaseUrl}${siteConfig.registryPath}/{name}.json`,
-      },
-    },
-    null,
-    2,
-  );
 }
 
 function normalizeGlobFiles<T>(files: Record<string, T>) {
@@ -98,8 +95,8 @@ function normalizeGlobPath(path: string) {
   return path.replace(/^(\.\.\/){3}/, "");
 }
 
-function getDocsPath(item: RegistryItem) {
-  return `${getRegistryItemRoot(item)}/docs.tsx`;
+function getMetaPath(item: RegistryItem) {
+  return `${getRegistryItemRoot(item)}/_meta.ts`;
 }
 
 function getRegistryItemRoot(item: RegistryItem) {
