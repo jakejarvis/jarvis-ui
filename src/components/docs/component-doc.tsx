@@ -16,7 +16,7 @@ type RegistryItemDocProps = {
 
 export function RegistryItemDoc({ item }: RegistryItemDocProps) {
   return (
-    <article className="flex flex-col gap-8">
+    <article className="flex min-w-0 flex-col gap-8">
       <header className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{item.type}</Badge>
@@ -30,7 +30,7 @@ export function RegistryItemDoc({ item }: RegistryItemDocProps) {
 
       <ComponentPreview name={item.name} />
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <Card>
           <CardHeader>
             <CardTitle>Usage</CardTitle>
@@ -53,7 +53,7 @@ export function RegistryItemDoc({ item }: RegistryItemDocProps) {
           </CardContent>
         </Card>
 
-        <aside className="flex flex-col gap-6">
+        <aside className="flex min-w-0 flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Install</CardTitle>

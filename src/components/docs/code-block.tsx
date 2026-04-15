@@ -24,9 +24,11 @@ export function CodeBlock({ code, label, className }: CodeBlockProps) {
   }
 
   return (
-    <div className={cn("overflow-hidden rounded-lg border bg-muted/40", className)}>
+    <div className={cn("min-w-0 overflow-hidden rounded-lg border bg-muted/40", className)}>
       <div className="flex min-h-10 items-center justify-between gap-3 border-b px-3">
-        <span className="text-xs font-medium text-muted-foreground">{label ?? "Code"}</span>
+        <span className="min-w-0 truncate text-xs font-medium text-muted-foreground">
+          {label ?? "Code"}
+        </span>
         <Button variant="ghost" size="icon-sm" onClick={() => void copyCode()}>
           {copied ? <IconCheck /> : <IconCopy />}
           <span className="sr-only">Copy code</span>

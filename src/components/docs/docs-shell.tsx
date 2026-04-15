@@ -33,8 +33,8 @@ export function DocsShell({ children }: DocsShellProps) {
       <Sidebar collapsible="offcanvas">
         <DocsSidebar />
       </Sidebar>
-      <SidebarInset className="min-w-0 md:w-[calc(100vw-var(--sidebar-width))] md:max-w-[calc(100vw-var(--sidebar-width))]">
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:hidden">
+      <SidebarInset className="min-w-0">
+        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur lg:hidden">
           <SidebarTrigger />
           <Separator orientation="vertical" className="h-5" />
           <div className="flex min-w-0 items-center gap-2">

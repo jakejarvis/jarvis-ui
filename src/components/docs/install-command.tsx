@@ -121,7 +121,7 @@ export function InstallCommand({ item, className }: InstallCommandProps) {
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <div className="overflow-hidden rounded-lg border bg-muted/40">
+      <div className="min-w-0 overflow-hidden rounded-lg border bg-muted/40">
         <div className="flex min-h-10 items-center justify-between gap-2 border-b px-2">
           <DropdownMenu>
             <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
