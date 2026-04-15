@@ -1,6 +1,6 @@
-import * as React from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
 import { IconBook, IconCode, IconExternalLink } from "@tabler/icons-react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import * as React from "react";
 
 import { Separator } from "@/components/ui/separator";
 import {
@@ -86,11 +86,16 @@ function DocsSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Registry JSON" render={<a href="/r/registry.json" />}>
-                  <IconCode />
-                  <span className="font-mono">registry.json</span>
-                  <IconExternalLink />
-                </SidebarMenuButton>
+                <SidebarMenuButton
+                  tooltip="Registry JSON"
+                  render={
+                    <a href="/r/registry.json">
+                      <IconCode />
+                      <span className="font-mono">registry.json</span>
+                      <IconExternalLink />
+                    </a>
+                  }
+                />
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

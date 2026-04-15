@@ -1,6 +1,6 @@
+import { TanStackDevtools } from "@tanstack/react-devtools";
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import { DocsShell } from "@/components/docs/docs-shell";
 import { ThemeProvider, themeScript } from "@/components/docs/theme-provider";
@@ -56,7 +56,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere]">
+      <body className="font-sans [overflow-wrap:anywhere] antialiased">
         {children}
         <TanStackDevtools
           config={{

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "jarvis-ui",
-  "homepage": "https://your-domain.com",
+  "homepage": "https://ui.jarv.is",
   "items": [
     {
       "name": "metric-card",

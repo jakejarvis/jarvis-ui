@@ -4,17 +4,22 @@ type PreviewModule = {
   Preview?: React.ComponentType;
 };
 
-const previewModules = import.meta.glob("../../../registry/base-nova/**/_preview.tsx", {
-  eager: true,
-}) as Record<string, PreviewModule>;
+const previewModules = import.meta.glob<PreviewModule>(
+  "../../../registry/base-nova/**/_preview.tsx",
+  {
+    eager: true,
+  },
+);
 
-const previewByName = Object.fromEntries(
-  Object.entries(previewModules).flatMap(([path, module]) => {
-    const name = getRegistryItemName(path);
+const previewByName: Record<string, React.ComponentType | undefined> = {};
 
-    return name && module.Preview ? [[name, module.Preview]] : [];
-  }),
-) as Record<string, React.ComponentType | undefined>;
+for (const [path, module] of Object.entries(previewModules)) {
+  const name = getRegistryItemName(path);
+
+  if (name && module.Preview) {
+    previewByName[name] = module.Preview;
+  }
+}
 
 type ComponentPreviewProps = {
   name: string;

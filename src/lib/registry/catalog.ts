@@ -7,7 +7,7 @@ export const siteConfig = {
   namespace: "@jarvis-ui",
   homepage: registryIndex.homepage,
   registryPath: "/r",
-  displayBaseUrl: "https://your-domain.com",
+  displayBaseUrl: "https://ui.jarv.is",
   description: "A minimal shadcn-compatible registry for reusable product components.",
 } as const;
 
@@ -19,15 +19,18 @@ type RegistryMetaModule = {
   usage?: string;
 };
 
-const registrySources = import.meta.glob("../../../registry/**/*.{ts,tsx}", {
+const registrySources = import.meta.glob<string>("../../../registry/**/*.{ts,tsx}", {
   eager: true,
   import: "default",
   query: "?raw",
-}) as Record<string, string>;
+});
 
-const registryMetaModules = import.meta.glob("../../../registry/base-nova/**/_meta.ts", {
-  eager: true,
-}) as Record<string, RegistryMetaModule>;
+const registryMetaModules = import.meta.glob<RegistryMetaModule>(
+  "../../../registry/base-nova/**/_meta.ts",
+  {
+    eager: true,
+  },
+);
 
 const registrySourceByPath = normalizeGlobFiles(registrySources);
 const metaByPath = normalizeGlobFiles(registryMetaModules);
@@ -43,8 +46,6 @@ export type RegistrySourceFile = RegistryFile & {
 export type RegistryCatalogItem = RegistryItem & {
   sourceFiles: RegistrySourceFile[];
   usage: string;
-  installCommand: string;
-  namespaceCommand: string;
 };
 
 export const registryItems = registryIndex.items.map((item) => ({
@@ -55,8 +56,6 @@ export const registryItems = registryIndex.items.map((item) => ({
     source: registrySourceByPath[file.path] ?? "",
   })),
   usage: metaByPath[getMetaPath(item)]?.usage ?? "",
-  installCommand: `bunx --bun shadcn@latest add ${siteConfig.displayBaseUrl}${siteConfig.registryPath}/${item.name}.json`,
-  namespaceCommand: `bunx --bun shadcn@latest add ${siteConfig.namespace}/${item.name}`,
 })) satisfies RegistryCatalogItem[];
 
 export function getRegistryItem(name: string) {

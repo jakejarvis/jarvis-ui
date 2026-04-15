@@ -17,8 +17,8 @@ describe("registry catalog", () => {
   });
 
   test("matches the registry index", () => {
-    const catalogNames = registryItems.map((item) => item.name).sort();
-    const registryNames = getRegistryJsonItemNames().sort();
+    const catalogNames = registryItems.map((item) => item.name).toSorted();
+    const registryNames = getRegistryJsonItemNames().toSorted();
 
     expect(catalogNames).toEqual(registryNames);
   });
@@ -26,16 +26,15 @@ describe("registry catalog", () => {
   test("registry index matches item metadata", () => {
     const metadataByName = new Map(registryMetadataItems.map((item) => [item.name, item]));
 
-    expect([...metadataByName.keys()].sort()).toEqual(getRegistryJsonItemNames().sort());
+    expect([...metadataByName.keys()].toSorted()).toEqual(getRegistryJsonItemNames().toSorted());
 
     for (const item of getRegistryJsonItems()) {
       expect(item).toEqual(metadataByName.get(item.name));
     }
   });
 
-  test("has install commands and snippets for every item", () => {
+  test("has usage snippets for every item", () => {
     for (const item of registryItems) {
-      expect(item.installCommand).toContain(`/r/${item.name}.json`);
       expect(item.usage).toContain(`import`);
     }
   });

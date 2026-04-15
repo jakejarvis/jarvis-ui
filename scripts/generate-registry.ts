@@ -8,7 +8,7 @@ import type { RegistryFileDefinition, RegistryItemDefinition } from "../src/lib/
 const registryConfig = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
   name: "jarvis-ui",
-  homepage: "https://your-domain.com",
+  homepage: "https://ui.jarv.is",
 } as const;
 
 const registryRoot = path.resolve("registry/base-nova");
@@ -35,7 +35,7 @@ async function main() {
 
   const order = await readExistingRegistryOrder();
   const items = [...records]
-    .sort((a, b) => compareRegistryItemRecords(a, b, order))
+    .toSorted((a, b) => compareRegistryItemRecords(a, b, order))
     .map((record) => record.item);
 
   await writeFile(
@@ -87,8 +87,6 @@ async function validateRegistryItemRecords(records: RegistryItemRecord[]) {
   const names = new Map<string, string>();
 
   for (const record of records) {
-    await validateRegistryItem(record);
-
     const existingPath = names.get(record.item.name);
 
     if (existingPath) {
@@ -99,6 +97,8 @@ async function validateRegistryItemRecords(records: RegistryItemRecord[]) {
 
     names.set(record.item.name, record.metaPath);
   }
+
+  await Promise.all(records.map(validateRegistryItem));
 }
 
 async function validateRegistryItem(record: RegistryItemRecord) {
@@ -112,9 +112,7 @@ async function validateRegistryItem(record: RegistryItemRecord) {
     throw new Error(`${metaPath} must list at least one registry file.`);
   }
 
-  for (const file of item.files) {
-    await validateRegistryFile(file, metaPath);
-  }
+  await Promise.all(item.files.map((file) => validateRegistryFile(file, metaPath)));
 }
 
 async function validateRegistryFile(file: RegistryFileDefinition, metaPath: string) {

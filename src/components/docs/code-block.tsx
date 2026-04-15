@@ -1,5 +1,5 @@
-import * as React from "react";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
