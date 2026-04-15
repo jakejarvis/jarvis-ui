@@ -2,13 +2,14 @@ import registryIndex from "../../../registry.json";
 import type { RegistryItemDefinition } from "./metadata";
 
 export const siteConfig = {
-  name: "Jarvis UI",
+  name: "@jarvis-ui",
   registryName: registryIndex.name,
   namespace: "@jarvis-ui",
   homepage: registryIndex.homepage,
   registryPath: "/r",
   displayBaseUrl: "https://ui.jarv.is",
-  description: "A minimal shadcn-compatible registry for reusable product components.",
+  description:
+    "An intentionally random collection of components and blocks, likely only useful to one person (me).",
 } as const;
 
 type RegistryItem = (typeof registryIndex.items)[number];
