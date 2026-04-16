@@ -2,7 +2,7 @@ import type { RegistryItemDefinition } from "@/lib/registry/metadata";
 
 export const registryItem = {
   name: "toast",
-  type: "registry:component",
+  type: "registry:ui",
   title: "Toast",
   description:
     "An opinionated toast manager and toaster built on Base UI with a Sonner-adjacent API.",
@@ -11,7 +11,7 @@ export const registryItem = {
   files: [
     {
       path: "registry/base-nova/toast/toast.tsx",
-      type: "registry:component",
+      type: "registry:ui",
     },
   ],
 } satisfies RegistryItemDefinition;

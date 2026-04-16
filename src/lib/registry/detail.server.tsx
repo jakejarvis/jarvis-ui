@@ -1,7 +1,7 @@
 import { renderServerComponent } from "@tanstack/react-start/rsc";
 
 import { getRegistryItem } from "./catalog";
-import type { RegistryItemDetailInput } from "./detail.types";
+import { isRegistryDetailType, type RegistryItemDetailInput } from "./detail.types";
 import { getRegistryDisplaySource } from "./display-source.server";
 import { highlightCodeToHtml } from "./highlight.server";
 import {
@@ -32,7 +32,7 @@ export type RegistryItemDetail = Omit<
 export async function getRegistryItemDetailData(data: RegistryItemDetailInput) {
   const item = getRegistryItem(data.name);
 
-  if (!item || item.type !== data.expectedType) {
+  if (!item || !isRegistryDetailType(item.type) || !data.expectedTypes.includes(item.type)) {
     return {
       name: data.name,
       item: null,

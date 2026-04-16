@@ -9,7 +9,7 @@ export const Route = createFileRoute("/blocks/$name")({
     getRegistryItemDetail({
       data: {
         name: params.name,
-        expectedType: "registry:block",
+        expectedTypes: ["registry:block"],
       },
     }),
   component: BlockRoute,

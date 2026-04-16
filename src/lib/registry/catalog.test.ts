@@ -1,7 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import {
-  getRegistryItemsByType,
+  componentRegistryTypes,
+  getRegistryItemsByTypes,
   registryMetadataItems,
   registryItems,
 } from "@/lib/registry/catalog";
@@ -42,8 +43,8 @@ describe("registry catalog", () => {
       getAlphabetizedItemNames(registryIndexItems),
     );
 
-    for (const type of ["registry:block", "registry:component"] as const) {
-      const items = getRegistryItemsByType(type);
+    for (const types of [componentRegistryTypes, ["registry:block"] as const]) {
+      const items = getRegistryItemsByTypes(types);
 
       expect(items.map((item) => item.name)).toEqual(getAlphabetizedItemNames(items));
     }
@@ -126,7 +127,7 @@ describe("registry catalog", () => {
       sourceFiles: [
         {
           path: "registry/base-nova/example/example.tsx",
-          type: "registry:component",
+          type: "registry:ui",
           source: "",
         },
         {

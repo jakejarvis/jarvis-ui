@@ -4,7 +4,12 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { getRegistryItemsByType, siteConfig } from "@/lib/registry/catalog";
+import {
+  componentRegistryTypes,
+  getRegistryItemsByType,
+  getRegistryItemsByTypes,
+  siteConfig,
+} from "@/lib/registry/catalog";
 import { cn } from "@/lib/utils";
 
 import { DocsSidebar } from "./docs-sidebar";
@@ -26,7 +31,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-14 max-w-screen-2xl items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger render={<Button variant="ghost" size="icon" className="lg:hidden" />}>
-            <IconMenu2 />
+            <IconMenu2 data-icon />
             <span className="sr-only">Toggle menu</span>
           </SheetTrigger>
           <SheetContent side="left" className="w-72 p-0">
@@ -70,7 +75,7 @@ export function SiteHeader() {
               />
             }
           >
-            <IconBrandGithub />
+            <IconBrandGithub data-icon />
             <span className="sr-only">GitHub</span>
           </Button>
           <ThemeToggle />
@@ -81,7 +86,7 @@ export function SiteHeader() {
 }
 
 function MobileNav({ pathname, onNavigate }: { pathname: string; onNavigate: () => void }) {
-  const componentItems = getRegistryItemsByType("registry:component");
+  const componentItems = getRegistryItemsByTypes(componentRegistryTypes);
   const blockItems = getRegistryItemsByType("registry:block");
 
   return (

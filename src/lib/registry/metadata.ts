@@ -1,3 +1,9 @@
+import type {
+  RegistryBaseItem as ShadcnRegistryBaseItem,
+  RegistryFontItem as ShadcnRegistryFontItem,
+  RegistryItem as ShadcnRegistryItem,
+} from "shadcn/schema";
+
 export const registryConfig = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
   name: "jarvis-ui",
@@ -6,40 +12,23 @@ export const registryConfig = {
 
 export const registryItemSchema = "https://ui.shadcn.com/schema/registry-item.json";
 
-export type RegistryFileType =
-  | "registry:component"
-  | "registry:lib"
-  | "registry:hook"
-  | "registry:ui"
-  | "registry:block"
-  | "registry:page"
-  | "registry:file"
-  | "registry:style"
-  | "registry:theme";
+type ShadcnRegistryFile = NonNullable<ShadcnRegistryItem["files"]>[number];
+type PrivateRegistryType = "registry:example" | "registry:internal";
+type PublicRegistryFileDefinition<T extends ShadcnRegistryFile> = T extends unknown
+  ? Omit<T, "content" | "type"> & { type: Exclude<T["type"], PrivateRegistryType> }
+  : never;
 
-export type RegistryItemType =
-  | "registry:block"
-  | "registry:component"
-  | "registry:hook"
-  | "registry:lib"
-  | "registry:page"
-  | "registry:style"
-  | "registry:theme"
-  | "registry:ui";
+export type RegistryItemType = Exclude<ShadcnRegistryItem["type"], PrivateRegistryType>;
 
-export type RegistryFileDefinition = {
-  path: string;
-  type: RegistryFileType;
-  target?: string;
-};
+export type RegistryFileDefinition = PublicRegistryFileDefinition<ShadcnRegistryFile>;
 
-export type RegistryItemDefinition = {
-  name: string;
+export type RegistryFileType = RegistryFileDefinition["type"];
+
+export type RegistryItemDefinition = Omit<ShadcnRegistryItem, "$schema" | "files" | "type"> & {
   type: RegistryItemType;
   title: string;
   description: string;
-  dependencies?: string[];
-  devDependencies?: string[];
-  registryDependencies?: string[];
   files: RegistryFileDefinition[];
+  config?: ShadcnRegistryBaseItem["config"];
+  font?: ShadcnRegistryFontItem["font"];
 };

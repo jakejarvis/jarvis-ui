@@ -1,3 +1,8 @@
+import {
+  registryItemSchema as shadcnRegistryItemSchema,
+  registrySchema as shadcnRegistrySchema,
+} from "shadcn/schema";
+
 import { registryItems, type RegistryCatalogItem } from "./catalog";
 import {
   registryConfig,
@@ -5,7 +10,7 @@ import {
   type RegistryFileDefinition,
   type RegistryItemDefinition,
 } from "./metadata";
-import { getRegistryItemWithSources } from "./source.server";
+import { getRegistryItemWithSources, type RegistryCatalogItemWithSources } from "./source.server";
 
 export const registryJsonResponseHeaders = {
   "Cache-Control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
@@ -24,10 +29,40 @@ type RegistryItemJson = Omit<RegistryItemDefinition, "files"> & {
   files: RegistryItemFileJson[];
 };
 
-type RegistryItemDependencyFields = Pick<
+type RegistryItemOptionalFields = Pick<
   RegistryItemDefinition,
-  "dependencies" | "devDependencies" | "registryDependencies"
+  | "author"
+  | "dependencies"
+  | "devDependencies"
+  | "registryDependencies"
+  | "tailwind"
+  | "cssVars"
+  | "css"
+  | "envVars"
+  | "font"
+  | "docs"
+  | "categories"
+  | "meta"
+  | "extends"
+  | "config"
 >;
+
+const registryItemOptionalFieldNames = [
+  "author",
+  "dependencies",
+  "devDependencies",
+  "registryDependencies",
+  "tailwind",
+  "cssVars",
+  "css",
+  "envVars",
+  "font",
+  "docs",
+  "categories",
+  "meta",
+  "extends",
+  "config",
+] as const satisfies readonly (keyof RegistryItemOptionalFields)[];
 
 export function getRegistryIndexJson(): RegistryIndexJson {
   return {
@@ -43,58 +78,155 @@ export function getRegistryItemJson(name: string): RegistryItemJson | null {
 }
 
 export function getRegistryValidationErrors(): string[] {
-  const errors: string[] = [];
   const names = new Map<string, string>();
+  const registryItemNames = new Set(registryItems.map((item) => item.name));
+  const errors = getRegistrySchemaValidationErrors();
 
   for (const item of registryItems) {
-    const existingName = names.get(item.name);
+    errors.push(...getRegistryItemValidationErrors(item, names, registryItemNames));
+  }
 
-    if (existingName) {
+  return errors;
+}
+
+function getRegistrySchemaValidationErrors(): string[] {
+  const parseResult = shadcnRegistrySchema.safeParse(getRegistryIndexJson());
+
+  if (parseResult.success) {
+    return [];
+  }
+
+  return parseResult.error.issues.map(
+    (issue) => `Registry index schema error: ${formatSchemaIssue(issue)}`,
+  );
+}
+
+function getRegistryItemValidationErrors(
+  item: RegistryCatalogItem,
+  names: Map<string, string>,
+  registryItemNames: Set<string>,
+): string[] {
+  const itemWithSources = getRegistryItemWithSources(item);
+
+  return [
+    ...getRegistryItemMetadataErrors(item, names),
+    ...getRegistryDependencyErrors(item, registryItemNames),
+    ...getRegistryFileValidationErrors(item),
+    ...getRegistrySourceValidationErrors(itemWithSources),
+    ...getRegistryItemSchemaValidationErrors(item, itemWithSources),
+  ];
+}
+
+function getRegistryItemMetadataErrors(
+  item: RegistryCatalogItem,
+  names: Map<string, string>,
+): string[] {
+  const errors: string[] = [];
+  const existingName = names.get(item.name);
+
+  if (existingName) {
+    errors.push(`Duplicate registry item name "${item.name}" in ${existingName} and ${item.name}.`);
+  }
+
+  names.set(item.name, item.name);
+
+  if (!item.name || !item.title || !item.description || !item.type) {
+    errors.push(`Registry item "${item.name}" has incomplete metadata.`);
+  }
+
+  if (item.files.length === 0) {
+    errors.push(`Registry item "${item.name}" must list at least one registry file.`);
+  }
+
+  if (item.type === "registry:font" && !item.font) {
+    errors.push(`Registry item "${item.name}" must include font metadata.`);
+  }
+
+  if (item.type !== "registry:font" && item.font) {
+    errors.push(`Registry item "${item.name}" must not include font metadata.`);
+  }
+
+  return errors;
+}
+
+function getRegistryDependencyErrors(
+  item: RegistryCatalogItem,
+  registryItemNames: Set<string>,
+): string[] {
+  const errors: string[] = [];
+
+  for (const registryDependency of item.registryDependencies ?? []) {
+    if (registryItemNames.has(registryDependency)) {
       errors.push(
-        `Duplicate registry item name "${item.name}" in ${existingName} and ${item.name}.`,
+        `Registry item "${item.name}" must use a URL for local registry dependency "${registryDependency}".`,
       );
-    }
-
-    names.set(item.name, item.name);
-
-    if (!item.name || !item.title || !item.description || !item.type) {
-      errors.push(`Registry item "${item.name}" has incomplete metadata.`);
-    }
-
-    if (item.files.length === 0) {
-      errors.push(`Registry item "${item.name}" must list at least one registry file.`);
-    }
-
-    for (const file of item.files) {
-      if (!file.path.startsWith("registry/")) {
-        errors.push(
-          `Registry item "${item.name}" contains a file path outside registry/: ${file.path}`,
-        );
-      }
-
-      if (file.path.endsWith("_meta.ts") || file.path.endsWith("_preview.tsx")) {
-        errors.push(`Registry item "${item.name}" must not publish metadata or preview files.`);
-      }
-
-      if ((file.type === "registry:file" || file.type === "registry:page") && !file.target) {
-        errors.push(`Registry item "${item.name}" file ${file.path} must include target.`);
-      }
-    }
-
-    const itemWithSources = getRegistryItemWithSources(item);
-
-    for (const file of itemWithSources.sourceFiles) {
-      if (file.source.length === 0) {
-        errors.push(`Registry item "${item.name}" references a missing file: ${file.path}`);
-      }
     }
   }
 
   return errors;
 }
 
-function toRegistryItemJson(item: RegistryCatalogItem): RegistryItemJson {
-  const itemWithSources = getRegistryItemWithSources(item);
+function getRegistryFileValidationErrors(item: RegistryCatalogItem): string[] {
+  const errors: string[] = [];
+
+  for (const file of item.files) {
+    if (!file.path.startsWith("registry/")) {
+      errors.push(
+        `Registry item "${item.name}" contains a file path outside registry/: ${file.path}`,
+      );
+    }
+
+    if (file.path.endsWith("_meta.ts") || file.path.endsWith("_preview.tsx")) {
+      errors.push(`Registry item "${item.name}" must not publish metadata or preview files.`);
+    }
+
+    if ((file.type === "registry:file" || file.type === "registry:page") && !file.target) {
+      errors.push(`Registry item "${item.name}" file ${file.path} must include target.`);
+    }
+  }
+
+  return errors;
+}
+
+function getRegistrySourceValidationErrors(item: RegistryCatalogItemWithSources): string[] {
+  const errors: string[] = [];
+
+  for (const file of item.sourceFiles) {
+    if (file.source.length === 0) {
+      errors.push(`Registry item "${item.name}" references a missing file: ${file.path}`);
+    }
+  }
+
+  return errors;
+}
+
+function getRegistryItemSchemaValidationErrors(
+  item: RegistryCatalogItem,
+  itemWithSources: RegistryCatalogItemWithSources,
+): string[] {
+  try {
+    const parseResult = shadcnRegistryItemSchema.safeParse(
+      toRegistryItemJson(item, itemWithSources),
+    );
+
+    if (parseResult.success) {
+      return [];
+    }
+
+    return parseResult.error.issues.map(
+      (issue) => `Registry item "${item.name}" schema error: ${formatSchemaIssue(issue)}`,
+    );
+  } catch (error) {
+    return [
+      `Registry item "${item.name}" could not be built for schema validation: ${getErrorMessage(error)}`,
+    ];
+  }
+}
+
+function toRegistryItemJson(
+  item: RegistryCatalogItem,
+  itemWithSources = getRegistryItemWithSources(item),
+): RegistryItemJson {
   const missingFiles = itemWithSources.sourceFiles
     .filter((file) => file.source.length === 0)
     .map((file) => file.path);
@@ -110,7 +242,7 @@ function toRegistryItemJson(item: RegistryCatalogItem): RegistryItemJson {
     description: item.description,
     files: itemWithSources.sourceFiles.map(toRegistryItemFileJson),
     type: item.type,
-    ...getRegistryItemDependencyFields(item),
+    ...getRegistryItemOptionalFields(item),
   };
 
   return registryItem;
@@ -123,35 +255,44 @@ function toRegistryItemDefinition(item: RegistryCatalogItem): RegistryItemDefini
     title: item.title,
     description: item.description,
     files: item.files,
-    ...getRegistryItemDependencyFields(item),
+    ...getRegistryItemOptionalFields(item),
   };
 
   return registryItem;
 }
 
-function getRegistryItemDependencyFields(
+function getRegistryItemOptionalFields(
   item: RegistryCatalogItem,
-): Partial<RegistryItemDependencyFields> {
-  const dependencyFields: Partial<RegistryItemDependencyFields> = {};
+): Partial<RegistryItemOptionalFields> {
+  const optionalFields: Partial<RegistryItemOptionalFields> = {};
 
-  if (item.dependencies) {
-    dependencyFields.dependencies = item.dependencies;
+  for (const field of registryItemOptionalFieldNames) {
+    const value = item[field];
+
+    if (value !== undefined) {
+      Object.assign(optionalFields, { [field]: value });
+    }
   }
 
-  if (item.devDependencies) {
-    dependencyFields.devDependencies = item.devDependencies;
-  }
-
-  if (item.registryDependencies) {
-    dependencyFields.registryDependencies = item.registryDependencies;
-  }
-
-  return dependencyFields;
+  return optionalFields;
 }
 
 function toRegistryItemFileJson(
   file: RegistryCatalogItem["sourceFiles"][number] & { source: string },
 ): RegistryItemFileJson {
+  if (file.type === "registry:file" || file.type === "registry:page") {
+    if (!file.target) {
+      throw new Error(`Registry file ${file.path} must include target.`);
+    }
+
+    return {
+      path: file.path,
+      type: file.type,
+      content: file.source,
+      target: file.target,
+    };
+  }
+
   const registryFile: RegistryItemFileJson = {
     path: file.path,
     type: file.type,
@@ -163,4 +304,14 @@ function toRegistryItemFileJson(
   }
 
   return registryFile;
+}
+
+function formatSchemaIssue(issue: { path: Array<string | number>; message: string }): string {
+  const path = issue.path.length > 0 ? issue.path.join(".") : "<root>";
+
+  return `${path}: ${issue.message}`;
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

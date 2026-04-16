@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import type { RegistryItemDetailInput } from "./detail.types";
+import { isRegistryDetailType, type RegistryItemDetailInput } from "./detail.types";
 
 export type { RegistryItemDetail } from "./detail.server";
 
@@ -17,17 +17,17 @@ function validateRegistryItemDetailInput(data: unknown): RegistryItemDetailInput
     throw new Error("Expected registry item detail input.");
   }
 
-  const { name, expectedType } = data;
+  const { name, expectedTypes } = data;
 
   if (typeof name !== "string" || name.length === 0) {
     throw new Error("Expected a registry item name.");
   }
 
-  if (expectedType !== "registry:block" && expectedType !== "registry:component") {
+  if (!Array.isArray(expectedTypes) || expectedTypes.some((type) => !isRegistryDetailType(type))) {
     throw new Error("Expected a registry item type.");
   }
 
-  return { name, expectedType };
+  return { name, expectedTypes };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

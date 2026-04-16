@@ -9,7 +9,7 @@ export const Route = createFileRoute("/components/$name")({
     getRegistryItemDetail({
       data: {
         name: params.name,
-        expectedType: "registry:component",
+        expectedTypes: ["registry:ui", "registry:component"],
       },
     }),
   component: ComponentRoute,

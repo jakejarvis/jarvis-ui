@@ -1,7 +1,7 @@
 import { useRouterState } from "@tanstack/react-router";
 import type * as React from "react";
 
-import { getRegistryItemsByType } from "@/lib/registry/catalog";
+import { componentRegistryTypes, getRegistryItemsByTypes } from "@/lib/registry/catalog";
 
 import { DocsSidebar } from "./docs-sidebar";
 
@@ -14,12 +14,12 @@ const docsSectionConfig = {
   components: {
     title: "Components",
     basePath: "/components",
-    registryType: "registry:component",
+    registryTypes: componentRegistryTypes,
   },
   blocks: {
     title: "Blocks",
     basePath: "/blocks",
-    registryType: "registry:block",
+    registryTypes: ["registry:block"],
   },
 } as const;
 
@@ -28,7 +28,7 @@ export function DocsLayout({ section, children }: DocsLayoutProps) {
     select: (state) => state.location.pathname,
   });
   const sectionConfig = docsSectionConfig[section];
-  const items = getRegistryItemsByType(sectionConfig.registryType);
+  const items = getRegistryItemsByTypes(sectionConfig.registryTypes);
 
   return (
     <div className="mx-auto flex w-full max-w-screen-2xl gap-8 px-4 sm:px-6 lg:px-8">

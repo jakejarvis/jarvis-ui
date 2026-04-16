@@ -22,6 +22,11 @@ type RegistryMetaModule = {
   registryItem?: RegistryItemDefinition;
 };
 
+export const componentRegistryTypes = [
+  "registry:ui",
+  "registry:component",
+] as const satisfies RegistryType[];
+
 const registryMetaModules = import.meta.glob<RegistryMetaModule>(
   "../../../registry/base-nova/**/_meta.ts",
   {
@@ -74,6 +79,12 @@ export function getRegistryItem(name: string): RegistryCatalogItem | undefined {
 
 export function getRegistryItemsByType(type: RegistryType): RegistryCatalogItem[] {
   return registryItems.filter((item) => item.type === type);
+}
+
+export function getRegistryItemsByTypes(types: readonly RegistryType[]): RegistryCatalogItem[] {
+  const typeSet = new Set(types);
+
+  return registryItems.filter((item) => typeSet.has(item.type));
 }
 
 function normalizeGlobFiles<T>(files: Record<string, T>): Record<string, T> {
