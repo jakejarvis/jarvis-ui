@@ -29,9 +29,17 @@ export function ComponentPreview({ name }: ComponentPreviewProps) {
   const Preview = previewByName[name];
 
   return (
-    <div className="flex min-h-72 items-center justify-center rounded-lg border bg-background p-6">
+    <div
+      data-slot="component-preview"
+      className="grid min-h-72 place-items-center rounded-lg border bg-background p-6"
+    >
       {Preview ? (
-        <Preview />
+        <div
+          data-slot="component-preview-stage"
+          className="grid min-h-60 w-full place-items-center"
+        >
+          <Preview />
+        </div>
       ) : (
         <p className="text-sm text-muted-foreground">No preview is available for this item.</p>
       )}
