@@ -1,7 +1,9 @@
 import {
   registryConfig,
   type RegistryFileDefinition,
+  type RegistryItemAuthoringDefinition,
   type RegistryItemDefinition,
+  type RegistrySourceFileDefinition,
 } from "./metadata";
 
 export const siteConfig = {
@@ -18,8 +20,12 @@ export const siteConfig = {
 type RegistryItem = RegistryItemDefinition;
 export type RegistryFile = RegistryFileDefinition;
 type RegistryType = RegistryItem["type"];
-type RegistryMetaModule = {
-  registryItem?: RegistryItemDefinition;
+type RegistryItemModule = {
+  registryItem?: RegistryItemAuthoringDefinition;
+};
+type RegistryItemModuleEntry = {
+  path: string;
+  registryItem: RegistryItemAuthoringDefinition;
 };
 
 export const componentRegistryTypes = [
@@ -27,25 +33,35 @@ export const componentRegistryTypes = [
   "registry:component",
 ] as const satisfies RegistryType[];
 
-const registryMetaModules = import.meta.glob<RegistryMetaModule>(
-  "../../../registry/base-nova/**/_meta.ts",
+const registryItemModules = import.meta.glob<RegistryItemModule>(
+  "../../../registry/base-nova/**/_registry.tsx",
   {
     eager: true,
   },
 );
 
-const metaByPath = normalizeGlobFiles(registryMetaModules);
+const registryItemModulesByPath = normalizeGlobFiles(registryItemModules);
 const registryItemCollator = new Intl.Collator("en", {
   numeric: true,
   sensitivity: "base",
 });
 
-export const registryMetadataItems = Object.values(metaByPath)
-  .flatMap((module) => (module.registryItem ? [module.registryItem] : []))
-  .toSorted(compareRegistryItemNames);
+const registryItemModuleEntries = Object.entries(registryItemModulesByPath)
+  .flatMap(([path, module]) =>
+    module.registryItem ? [{ path, registryItem: module.registryItem }] : [],
+  )
+  .toSorted((a, b) => compareRegistryItemNames(a.registryItem, b.registryItem));
+
+export const registryMetadataItems = registryItemModuleEntries.map(({ path, registryItem }) =>
+  toRegistryItemDefinition(
+    registryItem,
+    getRegistrySourceFileDefinitions(getRegistryItemRoot(path), registryItem),
+  ),
+);
 
 export type RegistrySourceFile = RegistryFile & {
   fileName: string;
+  sourcePath: string;
 };
 
 export type RegistryPreviewSourceFile = {
@@ -58,19 +74,62 @@ export type RegistryCatalogItem = RegistryItem & {
   previewSourceFile: RegistryPreviewSourceFile;
 };
 
-export const registryItems = registryMetadataItems.map(toRegistryCatalogItem);
+export const registryItems = registryItemModuleEntries.map(toRegistryCatalogItem);
 
-function toRegistryCatalogItem(item: RegistryItem): RegistryCatalogItem {
+function toRegistryCatalogItem(entry: RegistryItemModuleEntry): RegistryCatalogItem {
+  const itemRoot = getRegistryItemRoot(entry.path);
+  const sourceFiles = getRegistrySourceFileDefinitions(itemRoot, entry.registryItem);
+  const item = toRegistryItemDefinition(entry.registryItem, sourceFiles);
+
   return Object.assign({}, item, {
     sourceFiles: item.files.map(toRegistrySourceFile),
-    previewSourceFile: getPreviewSourceFile(item),
+    previewSourceFile: getPreviewSourceFile(entry.path),
+  });
+
+  function toRegistrySourceFile(file: RegistryFile): RegistrySourceFile {
+    const sourceFile = sourceFiles.find((candidate) => candidate.path === file.path);
+
+    return Object.assign({}, file, {
+      fileName: getFileName(file.path),
+      sourcePath: getRegistrySourcePath(itemRoot, sourceFile ?? file),
+    });
+  }
+}
+
+function getRegistrySourceFileDefinitions(
+  itemRoot: string,
+  item: RegistryItemAuthoringDefinition,
+): RegistrySourceFileDefinition[] {
+  return item.files ?? [getDefaultRegistryFile(itemRoot, item)];
+}
+
+function getDefaultRegistryFile(
+  itemRoot: string,
+  item: Pick<RegistryItemAuthoringDefinition, "name" | "type">,
+): RegistrySourceFileDefinition {
+  if (item.type === "registry:file" || item.type === "registry:page") {
+    throw new Error(`Registry item "${item.name}" must define files explicitly.`);
+  }
+
+  return {
+    path: `${itemRoot}/${item.name}.tsx`,
+    type: item.type,
+  };
+}
+
+function toRegistryItemDefinition(
+  item: RegistryItemAuthoringDefinition,
+  files: RegistrySourceFileDefinition[],
+): RegistryItemDefinition {
+  return Object.assign({}, item, {
+    files: files.map(toRegistryFileDefinition),
   });
 }
 
-function toRegistrySourceFile(file: RegistryFile): RegistrySourceFile {
-  return Object.assign({}, file, {
-    fileName: getFileName(file.path),
-  });
+function toRegistryFileDefinition(file: RegistrySourceFileDefinition): RegistryFileDefinition {
+  const { sourcePath: _sourcePath, ...registryFile } = file;
+
+  return registryFile;
 }
 
 export function getRegistryItem(name: string): RegistryCatalogItem | undefined {
@@ -106,32 +165,46 @@ function compareRegistryItemNames(
   );
 }
 
-function getPreviewSourceFile(item: RegistryItem): RegistryPreviewSourceFile {
-  const path = `${getRegistryItemRoot(item)}/_preview.tsx`;
-
+function getPreviewSourceFile(path: string): RegistryPreviewSourceFile {
   return {
     path,
     fileName: getFileName(path),
   };
 }
 
-function getRegistryItemRoot(item: RegistryItem): string {
-  const [firstFile] = item.files;
+function getRegistryItemRoot(path: string): string {
+  return path.split("/").slice(0, -1).join("/");
+}
 
-  if (!firstFile) {
-    return `registry/base-nova/${item.name}`;
+function getRegistrySourcePath(itemRoot: string, file: RegistrySourceFileDefinition): string {
+  const sourcePath = file.sourcePath ?? file.path;
+
+  if (sourcePath.startsWith("registry/")) {
+    return normalizePath(sourcePath.split("/"));
   }
 
-  const segments = firstFile.path.split("/");
-  const itemNameIndex = segments.indexOf(item.name);
-
-  if (itemNameIndex === -1) {
-    return segments.slice(0, -1).join("/");
-  }
-
-  return segments.slice(0, itemNameIndex + 1).join("/");
+  return normalizePath([...itemRoot.split("/"), ...sourcePath.split("/")]);
 }
 
 function getFileName(path: string): string {
   return path.split("/").at(-1) ?? path;
+}
+
+function normalizePath(segments: string[]): string {
+  const normalizedSegments: string[] = [];
+
+  for (const segment of segments) {
+    if (segment === "" || segment === ".") {
+      continue;
+    }
+
+    if (segment === "..") {
+      normalizedSegments.pop();
+      continue;
+    }
+
+    normalizedSegments.push(segment);
+  }
+
+  return normalizedSegments.join("/");
 }

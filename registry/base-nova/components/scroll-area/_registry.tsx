@@ -1,4 +1,14 @@
+import { defineRegistryItem } from "@/lib/registry/metadata";
+
 import { ScrollArea } from "./scroll-area";
+
+export const registryItem = defineRegistryItem({
+  name: "scroll-area",
+  type: "registry:ui",
+  title: "Scroll Area",
+  description: "A scroll container with overlay scrollbars and automatic edge fades.",
+  dependencies: ["@base-ui/react"],
+});
 
 const activity = [
   "Renewed domainstack.io",

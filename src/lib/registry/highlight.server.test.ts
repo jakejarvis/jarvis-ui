@@ -8,8 +8,10 @@ import {
 
 describe("registry syntax highlighting", () => {
   test("infers registry source languages from file paths", () => {
-    expect(getCodeLanguage("registry/base-nova/tipover/tipover.tsx")).toBe("tsx");
-    expect(getCodeLanguage("registry/base-nova/tipover/use-pointer-capability.ts")).toBe("ts");
+    expect(getCodeLanguage("registry/base-nova/components/tipover/tipover.tsx")).toBe("tsx");
+    expect(getCodeLanguage("registry/base-nova/components/tipover/use-pointer-capability.ts")).toBe(
+      "ts",
+    );
     expect(getCodeLanguage("registry/base-nova/readme.md")).toBe("text");
   });
 

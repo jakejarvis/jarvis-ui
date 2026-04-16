@@ -1,8 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { defineRegistryItem } from "@/lib/registry/metadata";
 
 import { Toaster, toast } from "./toast";
+
+export const registryItem = defineRegistryItem({
+  name: "toast",
+  type: "registry:ui",
+  title: "Toast",
+  description:
+    "An opinionated toast manager and toaster built on Base UI with a Sonner-adjacent API.",
+  dependencies: ["@base-ui/react", "@tabler/icons-react"],
+  registryDependencies: ["spinner"],
+});
 
 export function Preview() {
   return (

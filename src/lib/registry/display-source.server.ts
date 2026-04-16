@@ -3,6 +3,7 @@ import type { RegistryFileType } from "./metadata";
 
 type RegistryDisplaySourceFile = {
   path: string;
+  sourcePath?: string;
   source: string;
 };
 
@@ -30,11 +31,16 @@ export function getRegistryDisplaySource(
   file: RegistryDisplaySourceFile,
 ): string {
   const displayImportPaths = getRegistryDisplayImportPaths(item);
+  const importerPath = file.sourcePath ?? file.path;
 
   return file.source.replace(
     importSpecifierPattern,
     (match: string, prefix: string, specifier: string, suffix: string) => {
-      const sourcePath = resolveRegistrySourceImportPath(file.path, specifier, displayImportPaths);
+      const sourcePath = resolveRegistrySourceImportPath(
+        importerPath,
+        specifier,
+        displayImportPaths,
+      );
 
       if (!sourcePath) {
         return match;
@@ -55,6 +61,10 @@ function getRegistryDisplayImportPaths(item: RegistryDisplaySourceItem): Map<str
 
     if (importPath) {
       entries.push([file.path, importPath]);
+
+      if (file.sourcePath) {
+        entries.push([file.sourcePath, importPath]);
+      }
     }
   }
 

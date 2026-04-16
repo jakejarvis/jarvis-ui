@@ -1,3 +1,5 @@
+import { defineRegistryItem } from "@/lib/registry/metadata";
+
 import {
   Stepper,
   StepperContent,
@@ -10,6 +12,14 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "./stepper";
+
+export const registryItem = defineRegistryItem({
+  name: "stepper",
+  type: "registry:ui",
+  title: "Stepper",
+  description: "A keyboard-navigable multi-step flow with flexible triggers and panels.",
+  dependencies: ["@base-ui/react"],
+});
 
 export function Preview() {
   return (

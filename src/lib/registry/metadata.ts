@@ -22,6 +22,10 @@ export type RegistryItemType = Exclude<ShadcnRegistryItem["type"], PrivateRegist
 
 export type RegistryFileDefinition = PublicRegistryFileDefinition<ShadcnRegistryFile>;
 
+export type RegistrySourceFileDefinition = RegistryFileDefinition & {
+  sourcePath?: string;
+};
+
 export type RegistryFileType = RegistryFileDefinition["type"];
 
 export type RegistryItemDefinition = Omit<ShadcnRegistryItem, "$schema" | "files" | "type"> & {
@@ -32,3 +36,13 @@ export type RegistryItemDefinition = Omit<ShadcnRegistryItem, "$schema" | "files
   config?: ShadcnRegistryBaseItem["config"];
   font?: ShadcnRegistryFontItem["font"];
 };
+
+export type RegistryItemAuthoringDefinition = Omit<RegistryItemDefinition, "files"> & {
+  files?: RegistrySourceFileDefinition[];
+};
+
+export function defineRegistryItem(
+  item: RegistryItemAuthoringDefinition,
+): RegistryItemAuthoringDefinition {
+  return item;
+}

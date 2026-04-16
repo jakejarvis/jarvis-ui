@@ -31,11 +31,11 @@ export function getRegistryItemWithSources(
     ...item,
     sourceFiles: item.sourceFiles.map((file) => ({
       ...file,
-      source: getRegistrySource(file.path),
+      source: getRegistrySource(file.sourcePath),
     })),
     previewSourceFile: {
       ...item.previewSourceFile,
-      source: getRegistrySource(item.previewSourceFile.path),
+      source: getRegistryPreviewDisplaySource(getRegistrySource(item.previewSourceFile.path)),
     },
   };
 }
@@ -68,6 +68,19 @@ function getRegistrySource(path: string): string {
   const source = registrySourceByPath[path];
 
   return source ? trimBlankTrailingLines(source) : "";
+}
+
+export function getRegistryPreviewDisplaySource(source: string): string {
+  const withoutMetadataImport = source.replace(
+    /^import\s+\{\s*defineRegistryItem\s*\}\s+from\s+"@\/lib\/registry\/metadata";\n\n?/mu,
+    "",
+  );
+  const withoutRegistryItem = withoutMetadataImport.replace(
+    /^export const registryItem = defineRegistryItem\(\{[\s\S]*?^\}\);\n\n?/mu,
+    "",
+  );
+
+  return trimBlankTrailingLines(withoutRegistryItem.replace(/\n{3,}/gu, "\n\n"));
 }
 
 export function trimBlankTrailingLines(source: string): string {

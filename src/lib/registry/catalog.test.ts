@@ -126,19 +126,19 @@ describe("registry catalog", () => {
     const item = {
       sourceFiles: [
         {
-          path: "registry/base-nova/example/example.tsx",
+          path: "registry/base-nova/components/example/example.tsx",
           type: "registry:ui",
           source: "",
         },
         {
-          path: "registry/base-nova/example/use-example.ts",
+          path: "registry/base-nova/components/example/use-example.ts",
           type: "registry:hook",
           source: "",
         },
       ],
     } as const;
     const displaySource = getRegistryDisplaySource(item, {
-      path: "registry/base-nova/example/example.tsx",
+      path: "registry/base-nova/components/example/_registry.tsx",
       source: [`import { useExample } from "./use-example";`, `import "./example.css";`].join("\n"),
     });
 
@@ -151,6 +151,17 @@ describe("registry catalog", () => {
 
     for (const block of blocks) {
       expect(block.files.length).toBeGreaterThan(1);
+    }
+  });
+
+  test("keeps registry authoring metadata out of preview display source", () => {
+    for (const item of registryItems) {
+      const itemWithSources = getRegistryItemWithSources(item);
+
+      expect(itemWithSources.previewSourceFile.path.endsWith("_registry.tsx")).toBe(true);
+      expect(itemWithSources.previewSourceFile.source).toContain("export function Preview");
+      expect(itemWithSources.previewSourceFile.source).not.toContain("defineRegistryItem");
+      expect(itemWithSources.previewSourceFile.source).not.toContain("registryItem");
     }
   });
 });

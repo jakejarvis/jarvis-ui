@@ -1,6 +1,25 @@
 import { Button } from "@/components/ui/button";
+import { defineRegistryItem } from "@/lib/registry/metadata";
 
 import { Tipover, TipoverContent, TipoverTrigger } from "./tipover";
+
+export const registryItem = defineRegistryItem({
+  name: "tipover",
+  type: "registry:ui",
+  title: "Tipover",
+  description: "A touch-friendly tooltip that falls back to a popover on coarse pointers.",
+  dependencies: ["@base-ui/react"],
+  files: [
+    {
+      path: "registry/base-nova/components/tipover/tipover.tsx",
+      type: "registry:ui",
+    },
+    {
+      path: "registry/base-nova/components/tipover/use-pointer-capability.ts",
+      type: "registry:hook",
+    },
+  ],
+});
 
 export function Preview() {
   return (

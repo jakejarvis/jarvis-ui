@@ -22,7 +22,7 @@ Use **Vite+**: `vp install`, `vp dev`, `vp build`, `vp test`
 
 ## Tooling
 - **Vite+** (`vp`): dev/build/test/lint/fmt — config in `vite.config.ts`
-- **Registry**: `/r/*.json` is served by TanStack Start server routes from `registry/base-nova/**/_meta.ts` and raw source imports
+- **Registry**: `/r/*.json` is served by TanStack Start server routes from `registry/base-nova/**/_registry.tsx` and raw source imports
 
 ## File-Scoped Commands
 | Task | Command |

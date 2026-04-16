@@ -1,3 +1,5 @@
+import { defineRegistryItem } from "@/lib/registry/metadata";
+
 import {
   VideoPlayer,
   VideoPlayerContent,
@@ -10,6 +12,14 @@ import {
   VideoPlayerTimeRange,
   VideoPlayerVolumeRange,
 } from "./video-player";
+
+export const registryItem = defineRegistryItem({
+  name: "video-player",
+  type: "registry:ui",
+  title: "Video Player",
+  description: "A themed media-chrome video player with composable controls.",
+  dependencies: ["media-chrome"],
+});
 
 export function Preview() {
   return (

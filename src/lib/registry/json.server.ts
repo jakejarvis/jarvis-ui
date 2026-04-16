@@ -176,8 +176,8 @@ function getRegistryFileValidationErrors(item: RegistryCatalogItem): string[] {
       );
     }
 
-    if (file.path.endsWith("_meta.ts") || file.path.endsWith("_preview.tsx")) {
-      errors.push(`Registry item "${item.name}" must not publish metadata or preview files.`);
+    if (getFileName(file.path).startsWith("_")) {
+      errors.push(`Registry item "${item.name}" must not publish registry authoring files.`);
     }
 
     if ((file.type === "registry:file" || file.type === "registry:page") && !file.target) {
@@ -193,7 +193,7 @@ function getRegistrySourceValidationErrors(item: RegistryCatalogItemWithSources)
 
   for (const file of item.sourceFiles) {
     if (file.source.length === 0) {
-      errors.push(`Registry item "${item.name}" references a missing file: ${file.path}`);
+      errors.push(`Registry item "${item.name}" references a missing file: ${file.sourcePath}`);
     }
   }
 
@@ -314,4 +314,8 @@ function formatSchemaIssue(issue: { path: Array<string | number>; message: strin
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function getFileName(path: string): string {
+  return path.split("/").at(-1) ?? path;
 }

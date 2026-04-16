@@ -1,11 +1,14 @@
 import type * as React from "react";
 
+import type { RegistryItemDefinition } from "@/lib/registry/metadata";
+
 type PreviewModule = {
   Preview?: React.ComponentType;
+  registryItem?: Pick<RegistryItemDefinition, "name">;
 };
 
 const previewModules = import.meta.glob<PreviewModule>(
-  "../../../registry/base-nova/**/_preview.tsx",
+  "../../../registry/base-nova/**/_registry.tsx",
   {
     eager: true,
   },
@@ -14,7 +17,7 @@ const previewModules = import.meta.glob<PreviewModule>(
 const previewByName: Record<string, React.ComponentType | undefined> = {};
 
 for (const [path, module] of Object.entries(previewModules)) {
-  const name = getRegistryItemName(path);
+  const name = module.registryItem?.name ?? getRegistryItemName(path);
 
   if (name && module.Preview) {
     previewByName[name] = module.Preview;
@@ -49,7 +52,7 @@ export function ComponentPreview({ name }: ComponentPreviewProps) {
 
 function getRegistryItemName(path: string) {
   const segments = path.split("/");
-  const previewIndex = segments.indexOf("_preview.tsx");
+  const previewIndex = segments.indexOf("_registry.tsx");
 
   if (previewIndex <= 0) {
     return null;
