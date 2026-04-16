@@ -3,13 +3,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RegistryItemDoc, RegistryItemNotFound } from "@/components/docs/component-doc";
 import { DocsLayout } from "@/components/docs/docs-layout";
 import { getRegistryItemDetail } from "@/lib/registry/detail.functions";
+import { registrySections } from "@/lib/registry/sections";
+
+const section = registrySections.blocks;
 
 export const Route = createFileRoute("/blocks/$name")({
   loader: ({ params }) =>
     getRegistryItemDetail({
       data: {
         name: params.name,
-        expectedTypes: ["registry:block"],
+        expectedTypes: [...section.registryTypes],
       },
     }),
   component: BlockRoute,
@@ -19,11 +22,11 @@ function BlockRoute() {
   const { item } = Route.useLoaderData();
 
   return (
-    <DocsLayout section="blocks">
+    <DocsLayout section={section.id}>
       {!item ? (
         <RegistryItemNotFound />
       ) : (
-        <RegistryItemDoc item={item} section="Blocks" sectionPath="/blocks" />
+        <RegistryItemDoc item={item} section={section.title} sectionPath={section.basePath} />
       )}
     </DocsLayout>
   );

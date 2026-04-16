@@ -2,18 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { DocsLayout } from "@/components/docs/docs-layout";
 import { RegistryItemList } from "@/components/docs/registry-item-grid";
-import { getRegistryItemsByType } from "@/lib/registry/catalog";
+import { getRegistrySectionItems, registrySections } from "@/lib/registry/sections";
 
 export const Route = createFileRoute("/blocks/")({ component: BlocksIndex });
 
 function BlocksIndex() {
+  const section = registrySections.blocks;
+
   return (
-    <DocsLayout section="blocks">
+    <DocsLayout section={section.id}>
       <RegistryItemList
-        title="Blocks"
-        description="Larger composed UI patterns you can install into your project."
-        items={getRegistryItemsByType("registry:block")}
-        detailRoute="/blocks/$name"
+        title={section.title}
+        description={section.description}
+        items={getRegistrySectionItems(section.id)}
+        detailRoute={section.detailRoute}
       />
     </DocsLayout>
   );

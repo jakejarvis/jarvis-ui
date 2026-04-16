@@ -73,12 +73,6 @@ const config = defineConfig({
     devtools(),
     tailwindcss(),
     tanstackStart({
-      prerender: {
-        enabled: true,
-        autoSubfolderIndex: false,
-        crawlLinks: true,
-        failOnError: true,
-      },
       rsc: {
         enabled: true,
       },

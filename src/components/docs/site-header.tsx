@@ -4,27 +4,22 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { siteConfig } from "@/lib/registry/catalog";
 import {
-  componentRegistryTypes,
-  getRegistryItemsByType,
-  getRegistryItemsByTypes,
-  siteConfig,
-} from "@/lib/registry/catalog";
+  getRegistrySectionsWithItems,
+  type RegistrySectionWithItems,
+} from "@/lib/registry/sections";
 import { cn } from "@/lib/utils";
 
 import { DocsSidebar } from "./docs-sidebar";
 import { ThemeToggle } from "./theme-toggle";
-
-const navLinks = [
-  { label: "Components", href: "/components" },
-  { label: "Blocks", href: "/blocks" },
-] as const;
 
 export function SiteHeader() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
   const [open, setOpen] = React.useState(false);
+  const visibleSections = getRegistrySectionsWithItems();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -36,7 +31,11 @@ export function SiteHeader() {
           </SheetTrigger>
           <SheetContent side="left" className="w-72 p-0">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <MobileNav pathname={pathname} onNavigate={() => setOpen(false)} />
+            <MobileNav
+              sections={visibleSections}
+              pathname={pathname}
+              onNavigate={() => setOpen(false)}
+            />
           </SheetContent>
         </Sheet>
 
@@ -48,16 +47,16 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {navLinks.map((link) => (
+          {visibleSections.map((section) => (
             <Link
-              key={link.href}
-              to={link.href}
+              key={section.id}
+              to={section.basePath}
               className={cn(
                 "rounded-md px-3 py-1.5 text-sm transition-colors hover:text-foreground",
-                pathname.startsWith(link.href) ? "text-foreground" : "text-muted-foreground",
+                pathname.startsWith(section.basePath) ? "text-foreground" : "text-muted-foreground",
               )}
             >
-              {link.label}
+              {section.title}
             </Link>
           ))}
         </nav>
@@ -85,10 +84,15 @@ export function SiteHeader() {
   );
 }
 
-function MobileNav({ pathname, onNavigate }: { pathname: string; onNavigate: () => void }) {
-  const componentItems = getRegistryItemsByTypes(componentRegistryTypes);
-  const blockItems = getRegistryItemsByType("registry:block");
-
+function MobileNav({
+  sections,
+  pathname,
+  onNavigate,
+}: {
+  sections: RegistrySectionWithItems[];
+  pathname: string;
+  onNavigate: () => void;
+}) {
   return (
     <div className="flex flex-col gap-4 overflow-y-auto p-4 pt-12">
       <div className="flex flex-col gap-1">
@@ -102,42 +106,33 @@ function MobileNav({ pathname, onNavigate }: { pathname: string; onNavigate: () 
         >
           Home
         </Link>
-        {navLinks.map((link) => (
+        {sections.map((section) => (
           <Link
-            key={link.href}
-            to={link.href}
+            key={section.id}
+            to={section.basePath}
             onClick={onNavigate}
             className={cn(
               "rounded-md px-3 py-1.5 text-sm transition-colors hover:text-foreground",
-              pathname.startsWith(link.href)
+              pathname.startsWith(section.basePath)
                 ? "font-medium text-foreground"
                 : "text-muted-foreground",
             )}
           >
-            {link.label}
+            {section.title}
           </Link>
         ))}
       </div>
 
-      {componentItems.length > 0 && (
+      {sections.map((section) => (
         <DocsSidebar
-          title="Components"
-          items={componentItems}
-          basePath="/components"
+          key={section.id}
+          title={section.title}
+          items={section.items}
+          basePath={section.basePath}
           pathname={pathname}
           onNavigate={onNavigate}
         />
-      )}
-
-      {blockItems.length > 0 && (
-        <DocsSidebar
-          title="Blocks"
-          items={blockItems}
-          basePath="/blocks"
-          pathname={pathname}
-          onNavigate={onNavigate}
-        />
-      )}
+      ))}
     </div>
   );
 }

@@ -2,18 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { DocsLayout } from "@/components/docs/docs-layout";
 import { RegistryItemList } from "@/components/docs/registry-item-grid";
-import { componentRegistryTypes, getRegistryItemsByTypes } from "@/lib/registry/catalog";
+import { getRegistrySectionItems, registrySections } from "@/lib/registry/sections";
 
 export const Route = createFileRoute("/components/")({ component: ComponentsIndex });
 
 function ComponentsIndex() {
+  const section = registrySections.components;
+
   return (
-    <DocsLayout section="components">
+    <DocsLayout section={section.id}>
       <RegistryItemList
-        title="Components"
-        description="Reusable UI components you can install into your project."
-        items={getRegistryItemsByTypes(componentRegistryTypes)}
-        detailRoute="/components/$name"
+        title={section.title}
+        description={section.description}
+        items={getRegistrySectionItems(section.id)}
+        detailRoute={section.detailRoute}
       />
     </DocsLayout>
   );
