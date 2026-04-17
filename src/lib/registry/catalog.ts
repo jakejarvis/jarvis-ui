@@ -37,6 +37,7 @@ const registryItemModules = import.meta.glob<RegistryItemModule>(
   "../../../registry/base-nova/**/_registry.tsx",
   {
     eager: true,
+    query: "?registry-metadata",
   },
 );
 

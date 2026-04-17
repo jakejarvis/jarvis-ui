@@ -99,6 +99,16 @@ describe("registry catalog", () => {
     expect(getMissingRegistryPreviewPaths()).toEqual([]);
   });
 
+  test("loads metadata for client-only preview files", () => {
+    const copyButton = getRegistryItemByName("copy-button");
+    const toast = getRegistryItemByName("toast");
+
+    expect(copyButton.previewSourceFile.path).toBe(
+      "registry/base-nova/components/copy-button/_registry.tsx",
+    );
+    expect(toast.previewSourceFile.path).toBe("registry/base-nova/components/toast/_registry.tsx");
+  });
+
   test("trims blank trailing lines from imported source", () => {
     expect(trimBlankTrailingLines("const value = 1;\n\n \n\t")).toBe("const value = 1;");
     expect(trimBlankTrailingLines("const value = 1;  \n")).toBe("const value = 1;  ");

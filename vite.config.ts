@@ -7,6 +7,8 @@ import rsc from "@vitejs/plugin-rsc";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite-plus";
 
+import { registryMetadataPlugin } from "./src/lib/registry/metadata-plugin.ts";
+
 const config = defineConfig({
   staged: {
     "*": "vp check --fix",
@@ -70,6 +72,7 @@ const config = defineConfig({
   },
   resolve: { tsconfigPaths: true },
   plugins: [
+    registryMetadataPlugin(),
     devtools(),
     tailwindcss(),
     tanstackStart({
